@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>APW.Addressing</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Anthony P Watts</Authors>
+		<Description>Domain model for international addresses and ISO 3166-1 country codes.</Description>
+		<PackageTags>address countrycode iso3166 domain-driven-design value-object</PackageTags>
+		<RepositoryUrl>https://github.com/anthonypwatts/addressing</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="FluentValidation" Version="11.11.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+		<PackageReference Include="System.Text.Json" Version="9.0.4" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="LICENSE">
+		  <Pack>true</Pack>
+		  <PackagePath></PackagePath>
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md">
+			<Pack>true</Pack>
+			<PackagePath></PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>
