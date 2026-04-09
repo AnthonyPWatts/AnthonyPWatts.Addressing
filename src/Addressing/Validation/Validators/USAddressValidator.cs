@@ -9,11 +9,11 @@ namespace Addressing.Validation.Validators
         private static readonly Regex ZipCodeRegex = new Regex(@"^\d{5}(-\d{4})?$", RegexOptions.Compiled);
 
         private static readonly HashSet<string> ValidStates = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
-                "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA",
-                "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI"
-            };
+        {
+            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+            "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA",
+            "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI"
+        };
 
         public void Validate(Address address)
         {
@@ -32,11 +32,11 @@ namespace Addressing.Validation.Validators
             if (!ZipCodeRegex.IsMatch(address.PostalCode.Code))
                 throw new ArgumentException("PostalCode must be a valid US ZIP code (e.g., 12345 or 12345-6789).");
 
-            if (!string.IsNullOrWhiteSpace(address.StateOrProvince) &&
-                !ValidStates.Contains(address.StateOrProvince))
-            {
+            if (string.IsNullOrWhiteSpace(address.StateOrProvince))
+                throw new ArgumentException("StateOrProvince cannot be null or empty for US addresses.");
+
+            if (!ValidStates.Contains(address.StateOrProvince))
                 throw new ArgumentException($"StateOrProvince '{address.StateOrProvince}' is not a valid US state or territory.");
-            }
         }
     }
 }
