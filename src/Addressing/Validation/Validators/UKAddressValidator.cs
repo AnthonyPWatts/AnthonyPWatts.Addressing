@@ -6,7 +6,7 @@ namespace Addressing.Validation.Validators
     public class UKAddressValidator : IAddressValidator
     {
         private static readonly Regex PostcodeRegex = new Regex(
-            @"^(GIR 0AA|[A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9][A-Z]{2})$",
+            @"^(GIR 0AA|[A-Z]{1,2}[0-9][0-9A-Z]? [0-9][A-Z]{2})$",
             RegexOptions.Compiled);
 
 
