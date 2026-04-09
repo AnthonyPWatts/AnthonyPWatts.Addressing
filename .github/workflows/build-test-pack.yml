@@ -1,0 +1,32 @@
+name: build-test-pack
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore AnthonyPWatts.Addressing.sln
+
+      - name: Build
+        run: dotnet build AnthonyPWatts.Addressing.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test AnthonyPWatts.Addressing.sln --configuration Release --no-build
+
+      - name: Pack core package
+        run: dotnet pack src/Addressing/Addressing.csproj --configuration Release --no-build -o ./artifacts
