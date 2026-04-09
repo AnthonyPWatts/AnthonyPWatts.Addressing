@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addressing.Spain", "src\Add
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addressing.Tests", "tests\Addressing.Tests\Addressing.Tests.csproj", "{1E6A51C5-4D88-4405-8BF0-97464C444EFE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7DF9D28E-45BE-4275-8726-647D46A3EFC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{91F4AFCA-9E26-4D2F-9469-74D71CC93F77} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{77DAAE6B-5ED1-40D3-BF8C-D33F1C06C37E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{1E6A51C5-4D88-4405-8BF0-97464C444EFE} = {7DF9D28E-45BE-4275-8726-647D46A3EFC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2BBCEAD0-A1A2-4A1E-8A10-2D436162DAD6}
