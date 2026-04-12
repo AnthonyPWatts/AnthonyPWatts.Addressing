@@ -1,43 +1,59 @@
 # AnthonyPWatts.Addressing
 
-`AnthonyPWatts.Addressing` appears to be a .NET library for modelling postal addresses and validating them against country-specific rules. The repository currently contains a core package, a Spain extension package, unit tests, and a small console-based manual test rig.
+`AnthonyPWatts.Addressing` is a .NET library for modelling postal addresses and validating them using country-specific rules.
 
-## Project aims
+The solution currently contains:
 
-- Provide a compact domain model for postal addresses.
-- Represent ISO 3166-1 alpha-2 country codes as a first-class type.
-- Validate addresses through country-specific validators selected by country code.
-- Allow the validator set to be extended through additional packages.
+- a core library for address modelling and validator registration
+- built-in validators for Great Britain, the United States, and Canada
+- a Spain extension project
+- automated tests
+- a small manual test rig
 
-## Repository structure
+## What this library does
 
-- `src/Addressing` - Core library containing `Address`, `PostalCode`, `CountryCode`, validator interfaces, built-in validator factory, and built-in country validators.
-- `src/Addressing.Spain` - Spain-specific extension package that registers `SpanishAddressValidator` into the validator factory.
-- `tests/Addressing.Tests` - xUnit tests covering the built-in validators for the US, UK, and Canada.
-- `ManualTestRig` - Console app demonstrating service registration and runtime validation.
+The core package provides:
 
-## Architecture
+- `Address` as a compact address model
+- `CountryCode` as an ISO 3166-1 alpha-2 value object
+- `PostalCode` as a country-aware postal code value object
+- `IAddressValidator` for country-specific validation
+- `IAddressValidatorFactory` for resolving validators by country
+- `AddAddressing(...)` for DI registration of selected built-in validators
 
-The solution is organized around a small set of value objects and a validator-factory pattern:
+## Solution structure
 
-- `Address` captures line, city, province/state, postal code, and country.
-- `CountryCode` validates and normalizes ISO 3166-1 alpha-2 codes.
-- `PostalCode` couples a postal code value with a country.
-- `IAddressValidator` implementations enforce country-specific rules.
-- `IAddressValidatorFactory` resolves validators by country code.
-- `AddAddressing(...)` registers built-in validators for selected countries.
-- `AddSpainAddressing()` adds the Spain validator through a deferred startup-action mechanism.
+- `src/Addressing`  
+  Core library and NuGet package source
 
-The current built-in validator coverage appears to be:
+- `src/Addressing.Spain`  
+  Spain-specific validator extension
 
-- `US`
+- `tests/Addressing.Tests`  
+  xUnit tests for value objects, factory behaviour, DI registration, and validator behaviour
+
+- `ManualTestRig`  
+  Small console app for ad hoc manual experimentation
+
+## Built-in validator coverage
+
+The core package currently supports:
+
 - `GB`
+- `US`
 - `CA`
-- `ES` via the extension package
 
-## Usage
+Spain support exists in the separate `Addressing.Spain` project.
 
-### Register built-in validators
+## Installation
+
+For the core package:
+
+```bash
+dotnet add package APW.Addressing
+```
+
+## Quick start
 
 ```csharp
 using Addressing;
@@ -45,23 +61,30 @@ using Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
-services.AddAddressing(CountryCode.Parse("GB"), CountryCode.Parse("US"), CountryCode.Parse("CA"));
 
-var serviceProvider = services.BuildServiceProvider();
+services.AddAddressing(
+    CountryCode.Parse("GB"),
+    CountryCode.Parse("US"),
+    CountryCode.Parse("CA"));
+
+using var serviceProvider = services.BuildServiceProvider();
+
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
 var address = new Address(
-    "1600 Pennsylvania Avenue NW",
-    null,
-    "Washington",
-    "DC",
-    new PostalCode("20500", CountryCode.Parse("US")),
-    CountryCode.Parse("US"));
+    line1: "1600 Pennsylvania Avenue NW",
+    line2: null,
+    city: "Washington",
+    stateOrProvince: "DC",
+    postalCode: new PostalCode("20500", CountryCode.Parse("US")),
+    countryCode: CountryCode.Parse("US"));
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);
 ```
 
-### Register the Spain extension
+## Spain extension
+
+Spain support lives in a separate project.
 
 ```csharp
 using Addressing;
@@ -71,47 +94,45 @@ using Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
+
 services.AddAddressing(CountryCode.Parse("GB"), CountryCode.Parse("US"));
 services.AddSpainAddressing();
 
-var serviceProvider = services.BuildServiceProvider();
+using var serviceProvider = services.BuildServiceProvider();
 
-foreach (var action in serviceProvider.GetServices<IStartupAction>())
+foreach (var startupAction in serviceProvider.GetServices<IStartupAction>())
 {
-    action.Execute();
+    startupAction.Execute();
 }
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
-var spanishAddress = new Address(
-    "123 Main St",
-    null,
-    "Madrid",
-    null,
-    new PostalCode("28001", CountryCode.Parse("ES")),
-    CountryCode.Parse("ES"));
+var address = new Address(
+    line1: "Calle de Alcalá, 45",
+    line2: null,
+    city: "Madrid",
+    stateOrProvince: "Madrid",
+    postalCode: new PostalCode("28014", CountryCode.Parse("ES")),
+    countryCode: CountryCode.Parse("ES"));
 
-validatorFactory.GetValidator(spanishAddress.CountryCode).Validate(spanishAddress);
+validatorFactory.GetValidator(address.CountryCode).Validate(address);
 ```
 
-## Apparent release readiness gaps
+## Notes on current behaviour
 
-To move this repository toward an initial release, the highest-value next steps appear to be:
+A few design points are worth knowing up front:
 
-1. Add CI for `dotnet build` and `dotnet test` so every change is validated automatically.
-2. Add tests for `Addressing.Spain` and for the DI/startup-action registration flow, not just direct validator tests.
-3. Align and refresh package documentation so the package README and repository README match the actual API and usage model.
-4. Confirm package metadata and release flow for NuGet publishing, including versioning strategy and release notes.
-5. Add examples for common consumer scenarios, especially DI configuration and extension-package registration.
-6. Consider simplifying or documenting the startup-action workaround used by `AddSpainAddressing()` so extension registration is easier to understand.
+- `AddAddressing(...)` only registers the built-in validators you ask for
+- requesting an unsupported country through `AddAddressing(...)` currently results in an exception when the factory is resolved
+- `PostalCode` does not validate format on construction; format validation happens in country validators
+- US addresses currently require `StateOrProvince`
+- Canada allows province/territory to be omitted, but validates it when supplied
+- UK postcode validation currently expects uppercase postcodes with a space
 
-## Observations from the current codebase
+## Status
 
-- The core package is configured to generate a NuGet package from `src/Addressing/Addressing.csproj`.
-- The package-level README already exists at `src/Addressing/README.md`, but a repository-level README was previously missing.
-- The manual test rig is useful for exploration but should not be treated as a substitute for automated tests.
-- The current solution already has a sensible separation between core functionality, extensions, tests, and sample usage.
+This project is in active development and is being prepared for public NuGet use. Expect the API and package set to continue to evolve.
 
 ## License
 
-The repository includes `LICENSE.txt`.
+MIT. See `LICENSE.txt`.
