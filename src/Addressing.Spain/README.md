@@ -1,6 +1,6 @@
-# Addressing.Spain
+# ISOCodex.Addressing.Spain
 
-`Addressing.Spain` adds Spanish address validation support to the core `APW.Addressing` library.
+`ISOCodex.Addressing.Spain` adds Spanish address validation support to the core `ISOCodex.Addressing` library.
 
 ## What it provides
 
@@ -14,10 +14,10 @@ Register the core addressing services first.
 ## Example
 
 ```csharp
-using Addressing;
-using Addressing.Spain;
-using Addressing.Utilities;
-using Addressing.Validation;
+using ISOCodex.Addressing;
+using ISOCodex.Addressing.Spain;
+using ISOCodex.Addressing.Utilities;
+using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();

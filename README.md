@@ -40,17 +40,25 @@ using var serviceProvider = services.BuildServiceProvider();
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
 var address = new Address(
-    "10 Downing St",
-    null,
-    "London",
-    null,
-    new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
-    CountryCode.Parse("GB"));
+    line1: "10 Downing Street",
+    line2: null,
+    city: "London",
+    stateOrProvince: null,
+    postalCode: new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+    countryCode: CountryCode.Parse("GB"));
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);
 ```
 
+## Built-in validators
+
+- Great Britain (`GB`)
+- United States (`US`)
+- Canada (`CA`)
+
 ## Spain extension
+
+The Spain validator is delivered by the separate `ISOCodex.Addressing.Spain` package.
 
 ```bash
 dotnet add package ISOCodex.Addressing.Spain
@@ -65,25 +73,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddAddressing(CountryCode.Parse("GB"), CountryCode.Parse("US"));
+services.AddAddressing();
 services.AddSpainAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();
 
-foreach (var action in serviceProvider.GetServices<IStartupAction>())
+foreach (var startupAction in serviceProvider.GetServices<IStartupAction>())
 {
-    action.Execute();
+    startupAction.Execute();
 }
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 ```
 
-## Release readiness note
+## Release focus
 
-This rename pass intentionally standardises:
-- NuGet package IDs
-- root namespaces
-- README examples
-- solution and test project identity
+The current highest-value release task is to keep package identity, namespaces, NuGet metadata, and package documentation perfectly aligned. Consumers should never see `APW.Addressing`, `Addressing`, and `ISOCodex.Addressing` used interchangeably for the same core package.
 
-The next pass after applying these files should be a build, test, pack, and README sanity check.
+## License
+
+MIT
