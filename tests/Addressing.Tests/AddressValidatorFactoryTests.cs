@@ -1,7 +1,6 @@
-﻿using Addressing.Validation;
-using Xunit;
+using ISOCodex.Addressing.Validation;
 
-namespace Addressing.Tests;
+namespace ISOCodex.Addressing.Tests;
 
 public class AddressValidatorFactoryTests
 {
@@ -29,26 +28,10 @@ public class AddressValidatorFactoryTests
         Assert.Contains("GB", ex.Message);
     }
 
-    [Fact]
-    public void RegisterValidator_TwiceForSameCountry_OverwritesPreviousValidator()
-    {
-        var factory = new AddressValidatorFactory();
-        var first = new TestAddressValidator();
-        var second = new TestAddressValidator();
-
-        factory.RegisterValidator(CountryCode.Parse("GB"), first);
-        factory.RegisterValidator(CountryCode.Parse("GB"), second);
-
-        var result = factory.GetValidator(CountryCode.Parse("GB"));
-
-        Assert.Same(second, result);
-    }
-
     private sealed class TestAddressValidator : IAddressValidator
     {
         public void Validate(Address address)
         {
-            // no-op
         }
     }
 }

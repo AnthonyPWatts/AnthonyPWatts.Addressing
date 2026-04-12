@@ -1,15 +1,14 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addressing", "src\Addressing\Addressing.csproj", "{91F4AFCA-9E26-4D2F-9469-74D71CC93F77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISOCodex.Addressing", "src\Addressing\Addressing.csproj", "{91F4AFCA-9E26-4D2F-9469-74D71CC93F77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualTestRig", "ManualTestRig\ManualTestRig.csproj", "{C2BC8AF0-1C14-463C-B110-C7F3422264B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addressing.Spain", "src\Addressing.Spain\Addressing.Spain.csproj", "{77DAAE6B-5ED1-40D3-BF8C-D33F1C06C37E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISOCodex.Addressing.Spain", "src\Addressing.Spain\Addressing.Spain.csproj", "{77DAAE6B-5ED1-40D3-BF8C-D33F1C06C37E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addressing.Tests", "tests\Addressing.Tests\Addressing.Tests.csproj", "{1E6A51C5-4D88-4405-8BF0-97464C444EFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISOCodex.Addressing.Tests", "tests\Addressing.Tests\Addressing.Tests.csproj", "{1E6A51C5-4D88-4405-8BF0-97464C444EFE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject

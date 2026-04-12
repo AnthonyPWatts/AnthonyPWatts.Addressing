@@ -1,4 +1,4 @@
-namespace Addressing.Validation
+namespace ISOCodex.Addressing.Validation
 {
     public interface IAddressValidator
     {

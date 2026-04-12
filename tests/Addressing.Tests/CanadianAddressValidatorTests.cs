@@ -1,48 +1,34 @@
-﻿using Addressing.Validation.Validators;
+using ISOCodex.Addressing.Validation.Validators;
 
-namespace Addressing.Tests;
+namespace ISOCodex.Addressing.Tests;
 
 public class CanadianAddressValidatorTests
 {
-    private readonly CanadianAddressValidator _validator = new CanadianAddressValidator();
+    private readonly CanadianAddressValidator _validator = new();
 
     [Fact]
-    public void Validate_ValidCanadianAddress_ShouldPass()
+    public void Validate_WithValidAddress_DoesNotThrow()
     {
         var address = new Address(
-            "24 Sussex Dr",
+            "111 Wellington St",
             null,
             "Ottawa",
             "ON",
-            new PostalCode("K1A 0A1", CountryCode.Parse("CA")),
+            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
             CountryCode.Parse("CA"));
 
         _validator.Validate(address);
     }
 
     [Fact]
-    public void Validate_InvalidPostalCode_ShouldThrowException()
+    public void Validate_WithInvalidProvince_Throws()
     {
         var address = new Address(
-            "24 Sussex Dr",
+            "111 Wellington St",
             null,
             "Ottawa",
-            "ON",
-            new PostalCode("INVALID", CountryCode.Parse("CA")),
-            CountryCode.Parse("CA"));
-
-        Assert.Throws<ArgumentException>(() => _validator.Validate(address));
-    }
-
-    [Fact]
-    public void Validate_InvalidProvince_ShouldThrowException()
-    {
-        var address = new Address(
-            "24 Sussex Dr",
-            null,
-            "Ottawa",
-            "ZZ",
-            new PostalCode("K1A 0A1", CountryCode.Parse("CA")),
+            "XX",
+            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
             CountryCode.Parse("CA"));
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));

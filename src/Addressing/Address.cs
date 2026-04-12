@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Addressing
+namespace ISOCodex.Addressing
 {
     public sealed class Address
     {
@@ -20,10 +20,14 @@ namespace Addressing
             CountryCode countryCode)
         {
             if (string.IsNullOrWhiteSpace(line1))
+            {
                 throw new ArgumentException("Line1 cannot be null or empty.", nameof(line1));
+            }
 
             if (string.IsNullOrWhiteSpace(city))
+            {
                 throw new ArgumentException("City cannot be null or empty.", nameof(city));
+            }
 
             Line1 = line1;
             Line2 = line2;
@@ -34,4 +38,3 @@ namespace Addressing
         }
     }
 }
-
