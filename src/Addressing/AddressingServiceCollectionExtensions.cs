@@ -22,15 +22,12 @@ namespace ISOCodex.Addressing
                         case "US":
                             factory.RegisterValidator(country, new USAddressValidator());
                             break;
-
                         case "GB":
-                            factory.RegisterValidator(country, new UKAddressValidator());
+                            factory.RegisterValidator(country, new GBAddressValidator());
                             break;
-
                         case "CA":
-                            factory.RegisterValidator(country, new CanadianAddressValidator());
+                            factory.RegisterValidator(country, new CAAddressValidator());
                             break;
-
                         default:
                             throw new ArgumentException(
                                 $"No validator available for country code '{country.Code}'.");

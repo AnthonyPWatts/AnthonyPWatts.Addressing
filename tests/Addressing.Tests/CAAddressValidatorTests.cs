@@ -2,9 +2,9 @@ using ISOCodex.Addressing.Validation.Validators;
 
 namespace ISOCodex.Addressing.Tests;
 
-public class CanadianAddressValidatorTests
+public class CAAddressValidatorTests
 {
-    private readonly CanadianAddressValidator _validator = new();
+    private readonly CAAddressValidator _validator = new();
 
     [Fact]
     public void Validate_WithValidAddress_DoesNotThrow()

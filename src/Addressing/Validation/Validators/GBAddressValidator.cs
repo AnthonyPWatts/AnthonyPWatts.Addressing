@@ -3,12 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace ISOCodex.Addressing.Validation.Validators
 {
-    public class UKAddressValidator : IAddressValidator
+    public class GBAddressValidator : IAddressValidator
     {
-        private static readonly Regex PostcodeRegex =
-            new Regex(
-                @"^(GIR 0AA|[A-Z]{1,2}[0-9][0-9A-Z]? [0-9][A-Z]{2})$",
-                RegexOptions.Compiled);
+        private static readonly Regex PostcodeRegex = new Regex(
+            @"^(GIR 0AA|[A-Z]{1,2}[0-9][0-9A-Z]? [0-9][A-Z]{2})$",
+            RegexOptions.Compiled);
 
         public void Validate(Address address)
         {
@@ -29,13 +28,13 @@ namespace ISOCodex.Addressing.Validation.Validators
 
             if (address.CountryCode.Code != "GB")
             {
-                throw new ArgumentException("CountryCode must be 'GB' for UK addresses.");
+                throw new ArgumentException("CountryCode must be 'GB' for GB addresses.");
             }
 
             if (!PostcodeRegex.IsMatch(address.PostalCode.Code))
             {
                 throw new ArgumentException(
-                    "PostalCode must be a valid UK postcode (e.g., SW1A 1AA).");
+                    "PostalCode must be a valid GB postcode (e.g., SW1A 1AA).");
             }
         }
     }

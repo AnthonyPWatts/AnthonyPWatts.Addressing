@@ -7,23 +7,23 @@ namespace ISOCodex.Addressing.Tests;
 public class AddressingServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddAddressing_WithGb_RegistersFactoryThatCanResolveUkValidator()
+    public void AddAddressing_WithGb_RegistersFactoryThatCanResolveGbValidator()
     {
         var services = new ServiceCollection();
         services.AddAddressing(CountryCode.Parse("GB"));
 
         using var serviceProvider = services.BuildServiceProvider();
-
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
         var validator = factory.GetValidator(CountryCode.Parse("GB"));
 
-        Assert.IsType<UKAddressValidator>(validator);
+        Assert.IsType<GBAddressValidator>(validator);
     }
 
     [Fact]
     public void AddAddressing_WithUsGbCa_RegistersAllRequestedValidators()
     {
         var services = new ServiceCollection();
+
         services.AddAddressing(
             CountryCode.Parse("US"),
             CountryCode.Parse("GB"),
@@ -33,8 +33,8 @@ public class AddressingServiceCollectionExtensionsTests
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
         Assert.IsType<USAddressValidator>(factory.GetValidator(CountryCode.Parse("US")));
-        Assert.IsType<UKAddressValidator>(factory.GetValidator(CountryCode.Parse("GB")));
-        Assert.IsType<CanadianAddressValidator>(factory.GetValidator(CountryCode.Parse("CA")));
+        Assert.IsType<GBAddressValidator>(factory.GetValidator(CountryCode.Parse("GB")));
+        Assert.IsType<CAAddressValidator>(factory.GetValidator(CountryCode.Parse("CA")));
     }
 
     [Fact]

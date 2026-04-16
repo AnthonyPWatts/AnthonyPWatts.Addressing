@@ -3,24 +3,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ISOCodex.Addressing.Tests;
 
-public class CanadianAddressValidationIntegrationTests
+public class GbAddressValidationIntegrationTests
 {
     [Fact]
-    public void AddAddressing_WithCanada_AllowsValidationOfCanadianAddress()
+    public void AddAddressing_WithGb_AllowsValidationOfGbAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.Parse("CA"));
+        services.AddAddressing(CountryCode.Parse("GB"));
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
         var address = new Address(
-            "111 Wellington St",
+            "10 Downing St",
             null,
-            "Ottawa",
-            "ON",
-            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
-            CountryCode.Parse("CA"));
+            "London",
+            null,
+            new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+            CountryCode.Parse("GB"));
 
         factory.GetValidator(address.CountryCode).Validate(address);
     }
