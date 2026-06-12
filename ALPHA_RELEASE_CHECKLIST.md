@@ -13,7 +13,7 @@ Fast-track items before publishing the first alpha packages.
 
 ## Remaining
 
-- [ ] Remove unused core package dependencies, especially `FluentValidation` and `System.Text.Json`, unless they are part of the intended alpha API.
+- [x] Remove unused core package dependencies, especially `FluentValidation` and `System.Text.Json`, unless they are part of the intended alpha API.
 - [ ] Rework Spain registration so `services.AddAddressing(); services.AddSpainAddressing();` is enough, without manually executing startup actions.
 - [ ] Decide whether postal-code validators should normalize common input such as lowercase or missing spaces, or document that validators require canonical formatting.
 - [ ] Guard against mismatched `Address.CountryCode` and `PostalCode.Country`.
