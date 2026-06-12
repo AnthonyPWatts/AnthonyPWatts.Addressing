@@ -38,15 +38,12 @@ public class AddressingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddAddressing_WithUnsupportedCountry_ThrowsArgumentExceptionWhenFactoryIsResolved()
+    public void AddAddressing_WithUnsupportedCountry_ThrowsArgumentException()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.Parse("ES"));
-
-        using var serviceProvider = services.BuildServiceProvider();
 
         var ex = Assert.Throws<ArgumentException>(
-            () => serviceProvider.GetRequiredService<IAddressValidatorFactory>());
+            () => services.AddAddressing(CountryCode.Parse("ES")));
 
         Assert.Contains("ES", ex.Message);
     }

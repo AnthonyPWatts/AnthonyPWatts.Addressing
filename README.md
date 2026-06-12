@@ -67,7 +67,6 @@ dotnet add package ISOCodex.Addressing.Spain
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Spain;
-using ISOCodex.Addressing.Utilities;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -77,11 +76,6 @@ services.AddAddressing();
 services.AddSpainAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();
-
-foreach (var startupAction in serviceProvider.GetServices<IStartupAction>())
-{
-    startupAction.Execute();
-}
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 ```

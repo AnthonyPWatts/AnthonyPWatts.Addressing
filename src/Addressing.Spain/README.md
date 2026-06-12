@@ -16,7 +16,6 @@ Register the core addressing services first.
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Spain;
-using ISOCodex.Addressing.Utilities;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,11 +25,6 @@ services.AddAddressing();
 services.AddSpainAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();
-
-foreach (var startupAction in serviceProvider.GetServices<IStartupAction>())
-{
-    startupAction.Execute();
-}
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 
@@ -53,10 +47,6 @@ The Spain validator currently:
 - requires a 5-digit postal code
 - validates province names when provided
 - checks that the postal code prefix matches the supplied province when a province is supplied
-
-## Important note
-
-Spain registration currently uses a deferred startup-action mechanism, so startup actions must be executed after the service provider is built.
 
 ## License
 

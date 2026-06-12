@@ -1,6 +1,5 @@
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Spain;
-using ISOCodex.Addressing.Utilities;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,12 +39,5 @@ static IServiceProvider BuildAddressingServiceProvider()
     services.AddAddressing(CountryCode.Parse("GB"), CountryCode.Parse("US"));
     services.AddSpainAddressing();
 
-    var serviceProvider = services.BuildServiceProvider();
-
-    foreach (var action in serviceProvider.GetServices<IStartupAction>())
-    {
-        action.Execute();
-    }
-
-    return serviceProvider;
+    return services.BuildServiceProvider();
 }
