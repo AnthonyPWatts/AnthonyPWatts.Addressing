@@ -31,11 +31,27 @@ namespace ISOCodex.Addressing.Validation.Validators
                 throw new ArgumentException("CountryCode must be 'GB' for GB addresses.");
             }
 
-            if (!PostcodeRegex.IsMatch(address.PostalCode.Code))
+            var normalizedPostcode = NormalizePostcode(address.PostalCode.Code);
+
+            if (!PostcodeRegex.IsMatch(normalizedPostcode))
             {
                 throw new ArgumentException(
                     "PostalCode must be a valid GB postcode (e.g., SW1A 1AA).");
             }
+        }
+
+        private static string NormalizePostcode(string postcode)
+        {
+            var compactPostcode = postcode
+                .Replace(" ", string.Empty)
+                .ToUpperInvariant();
+
+            if (compactPostcode.Length <= 3)
+            {
+                return compactPostcode;
+            }
+
+            return compactPostcode.Insert(compactPostcode.Length - 3, " ");
         }
     }
 }

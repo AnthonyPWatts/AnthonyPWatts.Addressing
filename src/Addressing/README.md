@@ -90,6 +90,7 @@ Country support can be extended through additional packages. Spain support is pr
 
 - `PostalCode` itself does not enforce country-specific formatting
 - Validation is performed by the country validator
+- Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
 - `AddAddressing(...)` only registers the validators you explicitly request
 
 ## License

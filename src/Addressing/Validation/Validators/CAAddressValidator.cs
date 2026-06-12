@@ -38,7 +38,9 @@ namespace ISOCodex.Addressing.Validation.Validators
                 throw new ArgumentException("CountryCode must be 'CA' for CA addresses.");
             }
 
-            if (!PostalCodeRegex.IsMatch(address.PostalCode.Code))
+            var normalizedPostalCode = NormalizePostalCode(address.PostalCode.Code);
+
+            if (!PostalCodeRegex.IsMatch(normalizedPostalCode))
             {
                 throw new ArgumentException(
                     "PostalCode must be a valid CA postal code (e.g., A1A 1A1).");
@@ -50,6 +52,20 @@ namespace ISOCodex.Addressing.Validation.Validators
                 throw new ArgumentException(
                     $"StateOrProvince '{address.StateOrProvince}' is not a valid CA province or territory.");
             }
+        }
+
+        private static string NormalizePostalCode(string postalCode)
+        {
+            var compactPostalCode = postalCode
+                .Replace(" ", string.Empty)
+                .ToUpperInvariant();
+
+            if (compactPostalCode.Length != 6)
+            {
+                return compactPostalCode;
+            }
+
+            return compactPostalCode.Insert(3, " ");
         }
     }
 }

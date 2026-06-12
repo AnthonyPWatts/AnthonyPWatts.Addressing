@@ -21,6 +21,22 @@ public class GBAddressValidatorTests
     }
 
     [Fact]
+    public void Validate_WithLowercasePostcodeWithoutSpace_DoesNotThrow()
+    {
+        var address = new Address(
+            "10 Downing St",
+            null,
+            "London",
+            null,
+            new PostalCode("sw1a2aa", CountryCode.Parse("GB")),
+            CountryCode.Parse("GB"));
+
+        _validator.Validate(address);
+
+        Assert.Equal("sw1a2aa", address.PostalCode.Code);
+    }
+
+    [Fact]
     public void Validate_WithInvalidPostcode_Throws()
     {
         var address = new Address(

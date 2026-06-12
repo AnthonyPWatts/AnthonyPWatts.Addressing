@@ -40,7 +40,7 @@ namespace ISOCodex.Addressing.Validation.Validators
                 throw new ArgumentException("CountryCode must be 'US' for US addresses.");
             }
 
-            if (!ZipCodeRegex.IsMatch(address.PostalCode.Code))
+            if (!ZipCodeRegex.IsMatch(address.PostalCode.Code.Trim()))
             {
                 throw new ArgumentException(
                     "PostalCode must be a valid US ZIP code (e.g., 12345 or 12345-6789).");
