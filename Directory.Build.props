@@ -6,9 +6,9 @@
     <Authors>Anthony P Watts</Authors>
     <Company>ISOCodex</Company>
 
-    <RepositoryUrl>https://github.com/AnthonyPWatts/AnthonyPWatts.Addressing</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ISOCodex/ISOCodex.Addressing</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/AnthonyPWatts/AnthonyPWatts.Addressing</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ISOCodex/ISOCodex.Addressing</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -2,15 +2,6 @@
 
 `ISOCodex.Addressing` is a .NET library for modelling postal addresses and validating them against country-specific rules.
 
-> [!NOTE]
-> This library is in the process of being standardised under the **ISOCodex** name.
->
-> The intended long-term package and namespace direction is **`ISOCodex.Addressing`**.
-> The current repository name, **`AnthonyPWatts.Addressing`**, reflects the original project location and may change as the package is prepared for release.
->
-> Until the first stable NuGet release, package IDs, namespaces and repository names should be treated as pre-release and subject to change. The public API and naming will be settled before any stable package is published.
-
-
 ## Projects
 
 - `src/Addressing` - core types, DI registration, and built-in validators
@@ -97,7 +88,7 @@ var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFacto
 
 ## Release focus
 
-The current highest-value release task is to keep package identity, namespaces, NuGet metadata, and package documentation perfectly aligned. Consumers should never see `APW.Addressing`, `Addressing`, and `ISOCodex.Addressing` used interchangeably for the same core package.
+Package identity, namespaces, NuGet metadata, and package documentation should stay aligned under the `ISOCodex.Addressing` name.
 
 ## License
 
