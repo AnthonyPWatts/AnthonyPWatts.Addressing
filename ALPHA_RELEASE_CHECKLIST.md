@@ -18,4 +18,4 @@ Fast-track items before publishing the first alpha packages.
 - [x] Decide whether postal-code validators should normalize common input such as lowercase or missing spaces, or document that validators require canonical formatting.
 - [ ] Guard against mismatched `Address.CountryCode` and `PostalCode.Country`.
 - [ ] Add a release command/checklist that runs clean, restore, Release build, Release tests, pack, and package inspection.
-- [ ] Update GitHub Actions for the Node 20 deprecation warning from `actions/checkout@v4` and `actions/setup-dotnet@v4`.
+- [x] Update GitHub Actions for the Node 20 deprecation warning from `actions/checkout@v4` and `actions/setup-dotnet@v4`.
