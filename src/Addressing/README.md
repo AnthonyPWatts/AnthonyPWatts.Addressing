@@ -9,6 +9,7 @@
 - Address model suitable for application/domain use
 - Country-specific address formatting
 - Country-specific validation via `IAddressValidator`
+- Country-specific address profile metadata via `IAddressProfileProvider`
 - DI registration for selected built-in formatters and validators
 - Opt-in generic fallbacks for valid ISO countries without country packs
 - Built-in support for:
@@ -28,6 +29,7 @@ dotnet add package ISOCodex.Addressing
 - `CountryCode`
 - `PostalCode`
 - `IAddressFormatter`
+- `IAddressProfileProvider`
 - `AddressValidationResult`
 - `AddressValidationIssue`
 - `IAddressValidator`
@@ -248,6 +250,51 @@ var options = new AddressFormatOptions
 };
 ```
 
+## Address profiles / form metadata
+
+Address profiles provide framework-agnostic metadata for building address entry forms and APIs. A profile tells consumers which conceptual address fields are used for a country, which are required, what labels to show, the display order, and optional placeholders or help text.
+
+Profiles complement the `Address` model, formatters, and validators. They do not render UI, validate addresses, autocomplete, geocode, call remote services, or prove deliverability.
+
+```csharp
+using ISOCodex.Addressing.Profiles;
+
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
+var profile = profileProvider.GetProfile(CountryCode.GB);
+
+foreach (var field in profile.Fields.OrderBy(field => field.DisplayOrder))
+{
+    Console.WriteLine($"{field.Label}: {(field.IsRequired ? "required" : "optional")}");
+}
+```
+
+`AddAddressing(...)` registers country-specific profiles for the built-in `GB`, `US`, and `CA` countries you request. Extension packages can register their own profiles alongside their validators and formatters.
+
+Applications can serialize profile metadata for a frontend:
+
+```json
+{
+  "countryCode": "GB",
+  "source": "CountrySpecific",
+  "fields": [
+    {
+      "field": "AddressLine1",
+      "label": "Address line 1",
+      "isRequired": true,
+      "displayOrder": 10,
+      "placeholder": "10 Downing Street"
+    },
+    {
+      "field": "PostalCode",
+      "label": "Postcode",
+      "isRequired": true,
+      "displayOrder": 60,
+      "placeholder": "SW1A 2AA"
+    }
+  ]
+}
+```
+
 ### Omitting the country
 
 When the country is already shown elsewhere in your UI or data export, omit the country line:
@@ -298,6 +345,7 @@ Registered country formatters and validators always take precedence. For unregis
 
 - `PermissiveAddressValidator` - returns success for any non-null `Address`
 - `GenericAddressFormatter` - emits `Line1`, optional `Line2`, `City StateOrProvince PostalCode`, and the ISO country code
+- generic `AddressProfile` metadata with `Source = GenericFallback`
 
 Example output for a country without a specific formatter:
 

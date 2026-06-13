@@ -6,6 +6,7 @@
 
 - `SpanishAddressValidator`
 - `SpanishAddressFormatter`
+- Spanish address profile metadata
 - `AddSpainAddressing()` DI extension
 
 ## Prerequisites
@@ -17,6 +18,7 @@ Register the core addressing services first.
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Spain;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +32,7 @@ using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 
 var address = new Address(
     line1: "Calle Mayor 1",
@@ -44,6 +47,7 @@ var validationResult = validatorFactory
     .Validate(address);
 
 var formatted = formatter.Format(address);
+var profile = profileProvider.GetProfile(CountryCode.ES);
 ```
 
 Validation returns structured issue data:

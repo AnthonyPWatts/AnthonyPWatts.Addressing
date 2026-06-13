@@ -107,6 +107,53 @@ var withoutCountry = formatter.Format(
 
 Formatting is presentation only. It does not validate the address, normalize the stored postal code, or prove the address exists. Use the validator for country-specific validation before formatting when correctness matters.
 
+## Address profiles / form metadata
+
+Address profiles expose country-specific metadata that applications can use to build address entry experiences. They describe which conceptual address fields are relevant, required, labelled, ordered, and hinted for a country.
+
+Profiles are metadata only. They do not render UI, validate an address, format an address, autocomplete addresses, geocode, or prove deliverability. They are framework-agnostic, so the same data can be used from ASP.NET, Blazor, React, console tools, APIs, imports, or custom validation pipelines.
+
+```csharp
+using ISOCodex.Addressing.Profiles;
+
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
+var profile = profileProvider.GetProfile(CountryCode.GB);
+
+foreach (var field in profile.Fields.OrderBy(field => field.DisplayOrder))
+{
+    Console.WriteLine($"{field.Label}: {(field.IsRequired ? "required" : "optional")}");
+}
+```
+
+The built-in core profiles cover `GB`, `US`, and `CA` when those countries are registered with `AddAddressing(...)`. Spain contributes its profile from the `ISOCodex.Addressing.Spain` package when `AddSpainAddressing()` is called.
+
+`AddGenericAddressingFallbacks()` also registers a conservative generic profile for unsupported ISO countries. The returned profile has `Source = AddressProfileSource.GenericFallback`, while country-pack-backed profiles use `AddressProfileSource.CountrySpecific`.
+
+Applications can expose profile metadata to frontends as JSON if desired:
+
+```json
+{
+  "countryCode": "GB",
+  "source": "CountrySpecific",
+  "fields": [
+    {
+      "field": "AddressLine1",
+      "label": "Address line 1",
+      "isRequired": true,
+      "displayOrder": 10,
+      "placeholder": "10 Downing Street"
+    },
+    {
+      "field": "PostalCode",
+      "label": "Postcode",
+      "isRequired": true,
+      "displayOrder": 60,
+      "placeholder": "SW1A 2AA"
+    }
+  ]
+}
+```
+
 ## Structured validation results
 
 `Validate(...)` returns structured, form/API-friendly errors instead of throwing for ordinary validation failures:
@@ -214,6 +261,7 @@ With these fallbacks:
 - registered country packs are still used first
 - unregistered ISO countries use `PermissiveAddressValidator`
 - unregistered ISO countries use `GenericAddressFormatter`
+- unregistered ISO countries use a generic `AddressProfile`
 - validation does not prove the address is deliverable
 
 The fallback validator accepts any non-null `Address` instance. It is intended for store-first or validate-later workflows where the consuming application still wants a structured address object.

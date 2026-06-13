@@ -1,6 +1,7 @@
 using System;
 using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Formatting.Formatters;
+using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Validation;
 using ISOCodex.Addressing.Validation.Validators;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,13 @@ namespace ISOCodex.Addressing
         {
             services.TryAddAddressValidatorFactory();
             services.TryAddAddressFormatter();
+            services.TryAddAddressProfileProvider();
 
             foreach (var country in countries)
             {
                 services.AddBuiltInAddressValidator(country);
                 services.AddBuiltInAddressFormatter(country);
+                services.AddBuiltInAddressProfile(country);
             }
 
             return services;
@@ -68,6 +71,27 @@ namespace ISOCodex.Addressing
             return services;
         }
 
+        public static IServiceCollection AddAddressProfile(
+            this IServiceCollection services,
+            CountryCode country,
+            Func<AddressProfile> profileFactory)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (profileFactory == null)
+            {
+                throw new ArgumentNullException(nameof(profileFactory));
+            }
+
+            services.TryAddAddressProfileProvider();
+            services.AddSingleton(new AddressProfileRegistration(country, profileFactory));
+
+            return services;
+        }
+
         public static IServiceCollection AddFallbackAddressValidator(
             this IServiceCollection services,
             Func<IAddressValidator> validatorFactory)
@@ -108,6 +132,26 @@ namespace ISOCodex.Addressing
             return services;
         }
 
+        public static IServiceCollection AddFallbackAddressProfile(
+            this IServiceCollection services,
+            Func<AddressProfile> profileFactory)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (profileFactory == null)
+            {
+                throw new ArgumentNullException(nameof(profileFactory));
+            }
+
+            services.TryAddAddressProfileProvider();
+            services.AddSingleton(new AddressProfileFallbackRegistration(profileFactory));
+
+            return services;
+        }
+
         public static IServiceCollection AddGenericAddressingFallbacks(this IServiceCollection services)
         {
             if (services == null)
@@ -117,6 +161,7 @@ namespace ISOCodex.Addressing
 
             services.AddFallbackAddressValidator(() => new PermissiveAddressValidator());
             services.AddFallbackAddressFormatter(() => new GenericAddressFormatter());
+            services.AddFallbackAddressProfile(() => AddressProfileDefaults.CreateGenericFallbackProfile());
 
             return services;
         }
@@ -154,6 +199,30 @@ namespace ISOCodex.Addressing
                 default:
                     throw new ArgumentException(
                         $"No formatter available for country code '{country.Code}'.");
+            }
+        }
+
+        private static IServiceCollection AddBuiltInAddressProfile(
+            this IServiceCollection services,
+            CountryCode country)
+        {
+            switch (country.Code)
+            {
+                case "US":
+                    return services.AddAddressProfile(
+                        country,
+                        () => AddressProfileDefaults.CreateUnitedStatesProfile());
+                case "GB":
+                    return services.AddAddressProfile(
+                        country,
+                        () => AddressProfileDefaults.CreateGreatBritainProfile());
+                case "CA":
+                    return services.AddAddressProfile(
+                        country,
+                        () => AddressProfileDefaults.CreateCanadaProfile());
+                default:
+                    throw new ArgumentException(
+                        $"No profile available for country code '{country.Code}'.");
             }
         }
 
@@ -198,6 +267,28 @@ namespace ISOCodex.Addressing
                 }
 
                 return formatter;
+            });
+        }
+
+        private static void TryAddAddressProfileProvider(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IAddressProfileProvider>(sp =>
+            {
+                var provider = new DefaultAddressProfileProvider();
+
+                foreach (var registration in sp.GetServices<AddressProfileRegistration>())
+                {
+                    provider.RegisterProfile(
+                        registration.Country,
+                        registration.CreateProfile());
+                }
+
+                foreach (var registration in sp.GetServices<AddressProfileFallbackRegistration>())
+                {
+                    provider.RegisterFallbackProfile(registration.CreateProfile());
+                }
+
+                return provider;
             });
         }
     }
