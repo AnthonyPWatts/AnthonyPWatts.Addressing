@@ -127,6 +127,40 @@ if (!result.IsValid)
 
 Each issue includes a stable `Code`, a human-readable `Message`, and an optional `PropertyName`.
 
+## Unsupported countries and fallback behaviour
+
+`CountryCode` accepts any valid ISO 3166-1 alpha-2 country code, but country-specific formatting and validation are only available when a formatter and validator have been registered for that country.
+
+By default, unsupported countries remain explicit: `GetValidator(...)` and `Format(...)` throw when no country-specific service is registered. This helps applications catch missing country packs when strict validation is expected.
+
+For applications that need to save and display structured addresses for countries without a country pack, register generic fallbacks:
+
+```csharp
+var services = new ServiceCollection();
+
+services.AddAddressing(CountryCode.GB);
+services.AddGenericAddressingFallbacks();
+```
+
+With these fallbacks:
+
+- registered country packs are still used first
+- unregistered ISO countries use `PermissiveAddressValidator`
+- unregistered ISO countries use `GenericAddressFormatter`
+- validation does not prove the address is deliverable
+
+The fallback validator accepts any non-null `Address` instance. It is intended for store-first or validate-later workflows where the consuming application still wants a structured address object.
+
+The fallback formatter emits the available structured fields in a generic order and uses the ISO country code as the country line:
+
+```text
+1 Rue de Rivoli
+Paris 75001
+FR
+```
+
+Fallbacks do not make the `Address` model fully freeform. `Address` still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If an application needs to store addresses that cannot fit that structure, it should keep a separate raw/freeform field in its own persistence model.
+
 ## Built-in countries
 
 - Great Britain (`GB`)

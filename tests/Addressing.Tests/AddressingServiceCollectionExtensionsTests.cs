@@ -47,4 +47,31 @@ public class AddressingServiceCollectionExtensionsTests
 
         Assert.Contains("ES", ex.Message);
     }
+
+    [Fact]
+    public void AddGenericAddressingFallbacks_RegistersFallbackValidator()
+    {
+        var services = new ServiceCollection();
+        services.AddGenericAddressingFallbacks();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+        var validator = factory.GetValidator(CountryCode.Parse("FR"));
+
+        Assert.IsType<PermissiveAddressValidator>(validator);
+    }
+
+    [Fact]
+    public void AddAddressing_WithGenericFallbacks_PrefersCountryValidator()
+    {
+        var services = new ServiceCollection();
+        services.AddAddressing(CountryCode.GB);
+        services.AddGenericAddressingFallbacks();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+
+        Assert.IsType<GBAddressValidator>(factory.GetValidator(CountryCode.GB));
+        Assert.IsType<PermissiveAddressValidator>(factory.GetValidator(CountryCode.Parse("FR")));
+    }
 }

@@ -10,6 +10,7 @@
 - Country-specific address formatting
 - Country-specific validation via `IAddressValidator`
 - DI registration for selected built-in formatters and validators
+- Opt-in generic fallbacks for valid ISO countries without country packs
 - Built-in support for:
   - Great Britain (`GB`)
   - United States (`US`)
@@ -213,6 +214,36 @@ services.AddAddressFormatter(
 
 Custom formatters implement `ICountryAddressFormatter`. `IAddressFormatter` remains the single service consumers use to format any registered country.
 
+## Unsupported countries and generic fallbacks
+
+`CountryCode` can represent any valid ISO 3166-1 alpha-2 country code. That lets consumers store the country accurately even before this package has country-specific rules for it.
+
+Country-specific services are still explicit by default. If no formatter or validator is registered for an address's country, `IAddressFormatter.Format(...)` and `IAddressValidatorFactory.GetValidator(...)` throw. This is the right behaviour when an application expects strict, country-pack-backed handling.
+
+When an application needs to accept structured addresses for countries without a country pack, register generic fallbacks:
+
+```csharp
+services.AddAddressing(CountryCode.GB);
+services.AddGenericAddressingFallbacks();
+```
+
+Registered country formatters and validators always take precedence. For unregistered countries, `AddGenericAddressingFallbacks()` registers:
+
+- `PermissiveAddressValidator` - returns success for any non-null `Address`
+- `GenericAddressFormatter` - emits `Line1`, optional `Line2`, `City StateOrProvince PostalCode`, and the ISO country code
+
+Example output for a country without a specific formatter:
+
+```text
+1 Rue de Rivoli
+Paris 75001
+FR
+```
+
+This is intended for store-first, import, migration, and validate-later workflows. It does not prove that an address exists or is deliverable.
+
+Generic fallbacks do not make `Address` freeform. The core model still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If your application must preserve addresses that do not fit that structure, store the raw address text separately in your own data model.
+
 ## Country-specific notes
 
 ### Great Britain (`GB`)
@@ -246,6 +277,7 @@ Country support can be extended through additional packages. Spain support is pr
 - Built-in country names are currently English display names
 - Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
 - `AddAddressing(...)` only registers the built-in countries you explicitly request
+- `AddGenericAddressingFallbacks()` is opt-in and keeps registered country-specific services ahead of generic behaviour
 
 ## License
 

@@ -7,6 +7,7 @@ namespace ISOCodex.Addressing.Formatting
     {
         private readonly ConcurrentDictionary<string, ICountryAddressFormatter> _formatters =
             new ConcurrentDictionary<string, ICountryAddressFormatter>();
+        private ICountryAddressFormatter? _fallbackFormatter;
 
         public void RegisterFormatter(CountryCode countryCode, ICountryAddressFormatter formatter)
         {
@@ -18,6 +19,16 @@ namespace ISOCodex.Addressing.Formatting
             _formatters[countryCode.Code] = formatter;
         }
 
+        public void RegisterFallbackFormatter(ICountryAddressFormatter formatter)
+        {
+            if (formatter == null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            _fallbackFormatter = formatter;
+        }
+
         public string Format(Address address, AddressFormatOptions? options = null)
         {
             if (address == null)
@@ -27,8 +38,13 @@ namespace ISOCodex.Addressing.Formatting
 
             if (!_formatters.TryGetValue(address.CountryCode.Code, out var formatter))
             {
-                throw new InvalidOperationException(
-                    $"No address formatter registered for country code '{address.CountryCode.Code}'.");
+                if (_fallbackFormatter == null)
+                {
+                    throw new InvalidOperationException(
+                        $"No address formatter registered for country code '{address.CountryCode.Code}'.");
+                }
+
+                formatter = _fallbackFormatter;
             }
 
             return formatter.Format(address, options);

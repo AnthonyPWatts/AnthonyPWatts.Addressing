@@ -68,6 +68,59 @@ namespace ISOCodex.Addressing
             return services;
         }
 
+        public static IServiceCollection AddFallbackAddressValidator(
+            this IServiceCollection services,
+            Func<IAddressValidator> validatorFactory)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (validatorFactory == null)
+            {
+                throw new ArgumentNullException(nameof(validatorFactory));
+            }
+
+            services.TryAddAddressValidatorFactory();
+            services.AddSingleton(new AddressValidatorFallbackRegistration(validatorFactory));
+
+            return services;
+        }
+
+        public static IServiceCollection AddFallbackAddressFormatter(
+            this IServiceCollection services,
+            Func<ICountryAddressFormatter> formatterFactory)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (formatterFactory == null)
+            {
+                throw new ArgumentNullException(nameof(formatterFactory));
+            }
+
+            services.TryAddAddressFormatter();
+            services.AddSingleton(new AddressFormatterFallbackRegistration(formatterFactory));
+
+            return services;
+        }
+
+        public static IServiceCollection AddGenericAddressingFallbacks(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddFallbackAddressValidator(() => new PermissiveAddressValidator());
+            services.AddFallbackAddressFormatter(() => new GenericAddressFormatter());
+
+            return services;
+        }
+
         private static IServiceCollection AddBuiltInAddressValidator(
             this IServiceCollection services,
             CountryCode country)
@@ -117,6 +170,11 @@ namespace ISOCodex.Addressing
                         registration.CreateValidator());
                 }
 
+                foreach (var registration in sp.GetServices<AddressValidatorFallbackRegistration>())
+                {
+                    factory.RegisterFallbackValidator(registration.CreateValidator());
+                }
+
                 return factory;
             });
         }
@@ -132,6 +190,11 @@ namespace ISOCodex.Addressing
                     formatter.RegisterFormatter(
                         registration.Country,
                         registration.CreateFormatter());
+                }
+
+                foreach (var registration in sp.GetServices<AddressFormatterFallbackRegistration>())
+                {
+                    formatter.RegisterFallbackFormatter(registration.CreateFormatter());
                 }
 
                 return formatter;

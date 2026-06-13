@@ -172,6 +172,47 @@ public class AddressFormatterTests
     }
 
     [Fact]
+    public void Format_WhenFallbackFormatterRegistered_FormatsUnregisteredCountry()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFallbackFormatter(new GenericAddressFormatter());
+
+        var address = new Address(
+            "1 Rue de Rivoli",
+            null,
+            "Paris",
+            null,
+            new PostalCode("75001"),
+            CountryCode.Parse("FR"));
+
+        var result = formatter.Format(address);
+
+        Assert.Equal("1 Rue de Rivoli\nParis 75001\nFR", result);
+    }
+
+    [Fact]
+    public void Format_WhenCountryAndFallbackFormatterRegistered_UsesCountryFormatter()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.GB, new GBAddressFormatter());
+        formatter.RegisterFallbackFormatter(new GenericAddressFormatter());
+
+        var address = new Address(
+            "10 Downing Street",
+            null,
+            "London",
+            null,
+            new PostalCode("SW1A 2AA"),
+            CountryCode.GB);
+
+        var result = formatter.Format(address);
+
+        Assert.Equal(
+            "10 Downing Street\nLondon\nSW1A 2AA\nUnited Kingdom",
+            result);
+    }
+
+    [Fact]
     public void AddAddressing_WithGb_RegistersFormatter()
     {
         var services = new ServiceCollection();
@@ -211,6 +252,26 @@ public class AddressFormatterTests
             CountryCode.ES);
 
         Assert.Equal("custom format", formatter.Format(address));
+    }
+
+    [Fact]
+    public void AddGenericAddressingFallbacks_RegistersFallbackFormatter()
+    {
+        var services = new ServiceCollection();
+        services.AddGenericAddressingFallbacks();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+
+        var address = new Address(
+            "1 Rue de Rivoli",
+            null,
+            "Paris",
+            null,
+            new PostalCode("75001"),
+            CountryCode.Parse("FR"));
+
+        Assert.Equal("1 Rue de Rivoli\nParis 75001\nFR", formatter.Format(address));
     }
 
     private sealed class TestCountryAddressFormatter : ICountryAddressFormatter
