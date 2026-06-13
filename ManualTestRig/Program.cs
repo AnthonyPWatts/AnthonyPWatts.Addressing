@@ -13,7 +13,7 @@ var spanishAddress = new Address(
     null,
     "Madrid",
     null,
-    new PostalCode("28001", CountryCode.Parse("ES")),
+    new PostalCode("28001"),
     CountryCode.Parse("ES"));
 
 addressValidatorFactory.GetValidator(spanishAddress.CountryCode).Validate(spanishAddress);
@@ -24,7 +24,7 @@ var ukAddress = new Address(
     null,
     "London",
     null,
-    new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+    new PostalCode("SW1A 2AA"),
     CountryCode.Parse("GB"));
 
 addressValidatorFactory.GetValidator(ukAddress.CountryCode).Validate(ukAddress);

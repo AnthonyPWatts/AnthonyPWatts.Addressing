@@ -44,7 +44,7 @@ var address = new Address(
     line2: null,
     city: "London",
     stateOrProvince: null,
-    postalCode: new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+    postalCode: new PostalCode("SW1A 2AA"),
     countryCode: CountryCode.Parse("GB"));
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);

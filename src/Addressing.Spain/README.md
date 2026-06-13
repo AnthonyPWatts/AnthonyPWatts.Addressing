@@ -33,7 +33,7 @@ var address = new Address(
     line2: null,
     city: "Madrid",
     stateOrProvince: "Madrid",
-    postalCode: new PostalCode("28013", CountryCode.Parse("ES")),
+    postalCode: new PostalCode("28013"),
     countryCode: CountryCode.Parse("ES"));
 
 validatorFactory.GetValidator(CountryCode.Parse("ES")).Validate(address);

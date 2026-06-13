@@ -14,7 +14,7 @@ public class CAAddressValidatorTests
             null,
             "Ottawa",
             "ON",
-            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
+            new PostalCode("K1A 0A9"),
             CountryCode.Parse("CA"));
 
         _validator.Validate(address);
@@ -28,7 +28,7 @@ public class CAAddressValidatorTests
             null,
             "Ottawa",
             "ON",
-            new PostalCode("k1a0a9", CountryCode.Parse("CA")),
+            new PostalCode("k1a0a9"),
             CountryCode.Parse("CA"));
 
         _validator.Validate(address);
@@ -44,7 +44,7 @@ public class CAAddressValidatorTests
             null,
             "Ottawa",
             "XX",
-            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
+            new PostalCode("K1A 0A9"),
             CountryCode.Parse("CA"));
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));

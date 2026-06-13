@@ -19,7 +19,7 @@ public class GbAddressValidationIntegrationTests
             null,
             "London",
             null,
-            new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+            new PostalCode("SW1A 2AA"),
             CountryCode.Parse("GB"));
 
         factory.GetValidator(address.CountryCode).Validate(address);

@@ -16,6 +16,6 @@ Fast-track items before publishing the first alpha packages.
 - [x] Remove unused core package dependencies, especially `FluentValidation` and `System.Text.Json`, unless they are part of the intended alpha API.
 - [x] Rework Spain registration so `services.AddAddressing(); services.AddSpainAddressing();` is enough, without manually executing startup actions.
 - [x] Decide whether postal-code validators should normalize common input such as lowercase or missing spaces, or document that validators require canonical formatting.
-- [ ] Guard against mismatched `Address.CountryCode` and `PostalCode.Country`.
+- [x] Remove duplicate country source by making `Address.CountryCode` the single country value and `PostalCode` countryless.
 - [ ] Add a release command/checklist that runs clean, restore, Release build, Release tests, pack, and package inspection.
 - [x] Update GitHub Actions for the Node 20 deprecation warning from `actions/checkout@v4` and `actions/setup-dotnet@v4`.

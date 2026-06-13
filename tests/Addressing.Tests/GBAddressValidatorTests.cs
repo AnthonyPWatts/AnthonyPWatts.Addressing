@@ -14,7 +14,7 @@ public class GBAddressValidatorTests
             null,
             "London",
             null,
-            new PostalCode("SW1A 2AA", CountryCode.Parse("GB")),
+            new PostalCode("SW1A 2AA"),
             CountryCode.Parse("GB"));
 
         _validator.Validate(address);
@@ -28,7 +28,7 @@ public class GBAddressValidatorTests
             null,
             "London",
             null,
-            new PostalCode("sw1a2aa", CountryCode.Parse("GB")),
+            new PostalCode("sw1a2aa"),
             CountryCode.Parse("GB"));
 
         _validator.Validate(address);
@@ -44,7 +44,7 @@ public class GBAddressValidatorTests
             null,
             "London",
             null,
-            new PostalCode("BADCODE", CountryCode.Parse("GB")),
+            new PostalCode("BADCODE"),
             CountryCode.Parse("GB"));
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));

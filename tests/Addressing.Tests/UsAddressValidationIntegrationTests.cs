@@ -19,7 +19,7 @@ public class UsAddressValidationIntegrationTests
             null,
             "Washington",
             "DC",
-            new PostalCode("20500", CountryCode.Parse("US")),
+            new PostalCode("20500"),
             CountryCode.Parse("US"));
 
         factory.GetValidator(address.CountryCode).Validate(address);

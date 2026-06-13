@@ -19,7 +19,7 @@ public class CaAddressValidationIntegrationTests
             null,
             "Ottawa",
             "ON",
-            new PostalCode("K1A 0A9", CountryCode.Parse("CA")),
+            new PostalCode("K1A 0A9"),
             CountryCode.Parse("CA"));
 
         factory.GetValidator(address.CountryCode).Validate(address);

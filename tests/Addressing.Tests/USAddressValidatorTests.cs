@@ -14,7 +14,7 @@ public class USAddressValidatorTests
             null,
             "Washington",
             "DC",
-            new PostalCode("20500", CountryCode.Parse("US")),
+            new PostalCode("20500"),
             CountryCode.Parse("US"));
 
         _validator.Validate(address);
@@ -28,7 +28,7 @@ public class USAddressValidatorTests
             null,
             "Washington",
             null,
-            new PostalCode("20500", CountryCode.Parse("US")),
+            new PostalCode("20500"),
             CountryCode.Parse("US"));
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));

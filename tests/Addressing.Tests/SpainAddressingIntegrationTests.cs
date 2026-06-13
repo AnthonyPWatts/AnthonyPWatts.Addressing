@@ -22,7 +22,7 @@ public class SpainAddressingIntegrationTests
             null,
             "Madrid",
             "Madrid",
-            new PostalCode("28013", CountryCode.Parse("ES")),
+            new PostalCode("28013"),
             CountryCode.Parse("ES"));
 
         factory.GetValidator(CountryCode.Parse("ES")).Validate(address);
