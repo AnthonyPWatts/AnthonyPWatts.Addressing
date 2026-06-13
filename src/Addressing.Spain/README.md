@@ -52,6 +52,49 @@ Calle Mayor 1
 Spain
 ```
 
+## Formatting behaviour
+
+The Spanish formatter produces a postal-friendly layout using the core `IAddressFormatter` service. `AddSpainAddressing()` registers the Spanish formatter for `CountryCode.ES`, so consumers do not need to resolve Spain-specific services directly.
+
+Multi-line output:
+
+```text
+Calle Mayor 1
+28013 Madrid
+Spain
+```
+
+Single-line output:
+
+```csharp
+var singleLine = formatter.Format(
+    address,
+    new AddressFormatOptions
+    {
+        Style = AddressFormatStyle.SingleLine
+    });
+```
+
+```text
+Calle Mayor 1, 28013 Madrid, Spain
+```
+
+Country output can be omitted when the country is already known:
+
+```csharp
+var localOnly = formatter.Format(
+    address,
+    new AddressFormatOptions
+    {
+        IncludeCountry = false
+    });
+```
+
+```text
+Calle Mayor 1
+28013 Madrid
+```
+
 ## Validation behaviour
 
 The Spain validator currently:

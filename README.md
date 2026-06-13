@@ -54,6 +54,55 @@ validatorFactory.GetValidator(address.CountryCode).Validate(address);
 var formatted = formatter.Format(address);
 ```
 
+`formatted` contains a postal-friendly, country-specific layout:
+
+```text
+10 Downing Street
+London
+SW1A 2AA
+United Kingdom
+```
+
+## Address formatting
+
+Formatting is routed by `Address.CountryCode`. Register the countries your app supports, then ask `IAddressFormatter` to produce display or output text for each address.
+
+The built-in formatter handles:
+
+- country-specific line ordering
+- optional second address lines
+- postal code placement
+- country names
+- multi-line and single-line output
+
+For compact UI, logs, CSV exports, or search results, request a single-line format:
+
+```csharp
+var singleLine = formatter.Format(
+    address,
+    new AddressFormatOptions
+    {
+        Style = AddressFormatStyle.SingleLine
+    });
+```
+
+Output:
+
+```text
+10 Downing Street, London, SW1A 2AA, United Kingdom
+```
+
+If the country is already obvious from surrounding UI, you can omit it:
+
+```csharp
+var withoutCountry = formatter.Format(
+    address,
+    new AddressFormatOptions
+    {
+        IncludeCountry = false
+    });
+```
+
 ## Built-in countries
 
 - Great Britain (`GB`)
