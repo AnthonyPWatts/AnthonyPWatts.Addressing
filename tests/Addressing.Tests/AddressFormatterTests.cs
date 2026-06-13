@@ -1,0 +1,146 @@
+using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Formatting.Formatters;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ISOCodex.Addressing.Tests;
+
+public class AddressFormatterTests
+{
+    [Fact]
+    public void Format_WithRegisteredGbFormatter_ReturnsMultiLineAddress()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.GB, new GBAddressFormatter());
+
+        var address = new Address(
+            "10 Downing Street",
+            null,
+            "London",
+            null,
+            new PostalCode("SW1A 2AA"),
+            CountryCode.GB);
+
+        var result = formatter.Format(address);
+
+        Assert.Equal(
+            "10 Downing Street\nLondon\nSW1A 2AA\nUnited Kingdom",
+            result);
+    }
+
+    [Fact]
+    public void Format_WithSingleLineOptions_ReturnsSingleLineAddress()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.US, new USAddressFormatter());
+
+        var address = new Address(
+            "1600 Pennsylvania Avenue NW",
+            null,
+            "Washington",
+            "DC",
+            new PostalCode("20500"),
+            CountryCode.US);
+
+        var result = formatter.Format(
+            address,
+            new AddressFormatOptions
+            {
+                Style = AddressFormatStyle.SingleLine
+            });
+
+        Assert.Equal(
+            "1600 Pennsylvania Avenue NW, Washington, DC 20500, United States",
+            result);
+    }
+
+    [Fact]
+    public void Format_WithIncludeCountryFalse_ExcludesCountry()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.CA, new CAAddressFormatter());
+
+        var address = new Address(
+            "111 Wellington Street",
+            null,
+            "Ottawa",
+            "ON",
+            new PostalCode("K1A 0A9"),
+            CountryCode.CA);
+
+        var result = formatter.Format(
+            address,
+            new AddressFormatOptions
+            {
+                IncludeCountry = false
+            });
+
+        Assert.Equal("111 Wellington Street\nOttawa ON K1A 0A9", result);
+    }
+
+    [Fact]
+    public void Format_WhenNoFormatterRegistered_ThrowsInvalidOperationException()
+    {
+        var formatter = new AddressFormatter();
+        var address = new Address(
+            "Calle Mayor 1",
+            null,
+            "Madrid",
+            "Madrid",
+            new PostalCode("28013"),
+            CountryCode.ES);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => formatter.Format(address));
+
+        Assert.Contains("ES", ex.Message);
+    }
+
+    [Fact]
+    public void AddAddressing_WithGb_RegistersFormatter()
+    {
+        var services = new ServiceCollection();
+        services.AddAddressing(CountryCode.GB);
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+
+        var address = new Address(
+            "10 Downing Street",
+            null,
+            "London",
+            null,
+            new PostalCode("SW1A 2AA"),
+            CountryCode.GB);
+
+        Assert.Equal(
+            "10 Downing Street\nLondon\nSW1A 2AA\nUnited Kingdom",
+            formatter.Format(address));
+    }
+
+    [Fact]
+    public void AddAddressFormatter_WithCustomFormatter_RegistersFormatter()
+    {
+        var services = new ServiceCollection();
+        services.AddAddressFormatter(CountryCode.ES, () => new TestCountryAddressFormatter());
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+
+        var address = new Address(
+            "Calle Mayor 1",
+            null,
+            "Madrid",
+            "Madrid",
+            new PostalCode("28013"),
+            CountryCode.ES);
+
+        Assert.Equal("custom format", formatter.Format(address));
+    }
+
+    private sealed class TestCountryAddressFormatter : ICountryAddressFormatter
+    {
+        public string Format(Address address, AddressFormatOptions? options = null)
+        {
+            return "custom format";
+        }
+    }
+}

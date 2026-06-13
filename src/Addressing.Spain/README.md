@@ -1,10 +1,11 @@
 # ISOCodex.Addressing.Spain
 
-`ISOCodex.Addressing.Spain` adds Spanish address validation support to the core `ISOCodex.Addressing` library.
+`ISOCodex.Addressing.Spain` adds Spanish address validation and formatting support to the core `ISOCodex.Addressing` library.
 
 ## What it provides
 
 - `SpanishAddressValidator`
+- `SpanishAddressFormatter`
 - `AddSpainAddressing()` DI extension
 
 ## Prerequisites
@@ -15,6 +16,7 @@ Register the core addressing services first.
 
 ```csharp
 using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Spain;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +29,7 @@ services.AddSpainAddressing();
 using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 
 var address = new Address(
     line1: "Calle Mayor 1",
@@ -37,6 +40,16 @@ var address = new Address(
     countryCode: CountryCode.ES);
 
 validatorFactory.GetValidator(CountryCode.ES).Validate(address);
+
+var formatted = formatter.Format(address);
+```
+
+Default formatted output:
+
+```text
+Calle Mayor 1
+28013 Madrid
+Spain
 ```
 
 ## Validation behaviour

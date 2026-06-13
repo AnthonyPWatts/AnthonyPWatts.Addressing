@@ -1,0 +1,26 @@
+using System.Collections.Generic;
+
+namespace ISOCodex.Addressing.Formatting.Formatters
+{
+    public sealed class CAAddressFormatter : ICountryAddressFormatter
+    {
+        public string Format(Address address, AddressFormatOptions? options = null)
+        {
+            var lines = new List<string>
+            {
+                address.Line1
+            };
+
+            AddressFormatting.AddIfNotWhiteSpace(lines, address.Line2);
+            AddressFormatting.AddIfNotWhiteSpace(
+                lines,
+                AddressFormatting.JoinParts(
+                    " ",
+                    address.City,
+                    address.StateOrProvince,
+                    address.PostalCode.Code));
+
+            return AddressFormatting.FormatLines(lines, "Canada", options);
+        }
+    }
+}

@@ -7,6 +7,7 @@
 - ISO 3166-1 alpha-2 country code value object
 - Lightweight postal code value object
 - Address model suitable for application/domain use
+- Country-specific address formatting
 - Country-specific validation via `IAddressValidator`
 - DI registration for selected built-in validators
 - Built-in support for:
@@ -25,6 +26,7 @@ dotnet add package ISOCodex.Addressing
 - `Address`
 - `CountryCode`
 - `PostalCode`
+- `IAddressFormatter`
 - `IAddressValidator`
 - `IAddressValidatorFactory`
 
@@ -32,6 +34,7 @@ dotnet add package ISOCodex.Addressing
 
 ```csharp
 using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,6 +48,7 @@ services.AddAddressing(
 using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 ```
 
 ## Validate an address
@@ -61,6 +65,34 @@ var address = new Address(
     countryCode: CountryCode.GB);
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);
+```
+
+## Format an address
+
+```csharp
+using ISOCodex.Addressing.Formatting;
+
+var formatted = formatter.Format(address);
+```
+
+Default output is multi-line and includes the country:
+
+```text
+10 Downing Street
+London
+SW1A 2AA
+United Kingdom
+```
+
+Single-line output is also supported:
+
+```csharp
+var singleLine = formatter.Format(
+    address,
+    new AddressFormatOptions
+    {
+        Style = AddressFormatStyle.SingleLine
+    });
 ```
 
 ## Country-specific notes
@@ -90,6 +122,7 @@ Country support can be extended through additional packages. Spain support is pr
 
 - `PostalCode` itself does not enforce country-specific formatting
 - Validation is performed by the country validator
+- Formatting is performed by the country formatter registered for `Address.CountryCode`
 - Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
 - `AddAddressing(...)` only registers the validators you explicitly request
 

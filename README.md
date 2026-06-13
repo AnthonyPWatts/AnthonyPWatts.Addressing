@@ -1,10 +1,10 @@
 # ISOCodex.Addressing
 
-`ISOCodex.Addressing` is a .NET library for modelling postal addresses and validating them against country-specific rules.
+`ISOCodex.Addressing` is a .NET library for modelling, formatting, and validating postal addresses against country-specific rules.
 
 ## Projects
 
-- `src/Addressing` - core types, DI registration, and built-in validators
+- `src/Addressing` - core types, DI registration, built-in formatters, and built-in validators
 - `src/Addressing.Spain` - Spain extension package
 - `tests/Addressing.Tests` - unit and integration-style tests
 - `ManualTestRig` - small console app for quick manual smoke testing
@@ -25,6 +25,7 @@ dotnet add package ISOCodex.Addressing
 
 ```csharp
 using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,6 +39,7 @@ services.AddAddressing(
 using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 
 var address = new Address(
     line1: "10 Downing Street",
@@ -48,9 +50,11 @@ var address = new Address(
     countryCode: CountryCode.GB);
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);
+
+var formatted = formatter.Format(address);
 ```
 
-## Built-in validators
+## Built-in countries
 
 - Great Britain (`GB`)
 - United States (`US`)
@@ -58,7 +62,7 @@ validatorFactory.GetValidator(address.CountryCode).Validate(address);
 
 ## Spain extension
 
-The Spain validator is delivered by the separate `ISOCodex.Addressing.Spain` package.
+Spain support is delivered by the separate `ISOCodex.Addressing.Spain` package.
 
 ```bash
 dotnet add package ISOCodex.Addressing.Spain
@@ -66,6 +70,7 @@ dotnet add package ISOCodex.Addressing.Spain
 
 ```csharp
 using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Spain;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +83,7 @@ services.AddSpainAddressing();
 using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 ```
 
 ## Release focus
