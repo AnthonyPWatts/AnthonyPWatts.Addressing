@@ -22,7 +22,7 @@ The script performs:
 
 Expected packages:
 
-- `ISOCodex.Addressing.1.0.0-alpha.1.nupkg`
-- `ISOCodex.Addressing.Spain.1.0.0-alpha.1.nupkg`
+- `ISOCodex.Addressing.1.0.0-alpha.2.nupkg`
+- `ISOCodex.Addressing.Spain.1.0.0-alpha.2.nupkg`
 
 The generated packages are written to `artifacts/release-check`, which is ignored by Git.
