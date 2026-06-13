@@ -127,6 +127,73 @@ if (!result.IsValid)
 
 Each issue includes a stable `Code`, a human-readable `Message`, and an optional `PropertyName`.
 
+### Using validation results with FluentValidation
+
+`ISOCodex.Addressing` does not depend on FluentValidation. The core package returns structured validation results so applications can adapt address validation into FluentValidation, ASP.NET ModelState, Blazor forms, imports, or their own validation pipeline.
+
+For example, a consuming application can call the address validator from a FluentValidation rule and map each `AddressValidationIssue` to a FluentValidation failure:
+
+```csharp
+using FluentValidation;
+using ISOCodex.Addressing;
+using ISOCodex.Addressing.Validation;
+
+public sealed class Customer
+{
+    public Address Address { get; init; } = default!;
+}
+
+public sealed class CustomerValidator : AbstractValidator<Customer>
+{
+    public CustomerValidator(IAddressValidatorFactory addressValidatorFactory)
+    {
+        RuleFor(customer => customer.Address)
+            .Custom((address, context) =>
+            {
+                if (address is null)
+                {
+                    context.AddFailure("Address", "Address is required.");
+                    return;
+                }
+
+                var validator = addressValidatorFactory.GetValidator(address.CountryCode);
+                var result = validator.Validate(address);
+
+                foreach (var issue in result.Issues)
+                {
+                    var propertyName = string.IsNullOrWhiteSpace(issue.PropertyName)
+                        ? "Address"
+                        : $"Address.{issue.PropertyName}";
+
+                    context.AddFailure(propertyName, issue.Message);
+                }
+            });
+    }
+}
+```
+
+If unsupported countries are possible in your application, register generic fallbacks or handle the explicit `GetValidator(...)` failure in your application validation layer.
+
+Framework-neutral adapters can use the same issue data:
+
+```csharp
+using System.Collections.Generic;
+using System.Linq;
+using ISOCodex.Addressing.Validation;
+
+public static IReadOnlyDictionary<string, string[]> ToErrorDictionary(
+    AddressValidationResult result)
+{
+    return result.Issues
+        .GroupBy(issue => issue.PropertyName ?? string.Empty)
+        .ToDictionary(
+            group => group.Key,
+            group => group.Select(issue => issue.Message).ToArray());
+}
+```
+
+This keeps the core package framework-agnostic. An optional adapter package may be considered later if there is enough demand, but consumers do not need one in order to use the current validators from FluentValidation.
+
 ## Unsupported countries and fallback behaviour
 
 `CountryCode` accepts any valid ISO 3166-1 alpha-2 country code, but country-specific formatting and validation are only available when a formatter and validator have been registered for that country.
@@ -194,6 +261,42 @@ CountryCode char(2) not null
 ```
 
 These lengths are practical defaults, not package-enforced limits. Applications with legacy imports, unusually long organization names, or strict partner schemas can choose wider columns without changing how the library works.
+
+## Recommended validation state storage
+
+Saving an address and validating an address are separate concerns. Consumers that need imports, review queues, fallback handling, or background revalidation should store validation state alongside the address instead of treating every saved row as verified.
+
+Suggested optional columns:
+
+| Column | Suggested type | Notes |
+| --- | --- | --- |
+| `ValidationStatus` | `nvarchar(32)` | `NotValidated`, `Valid`, `Invalid`, or `AcceptedUnverified`. |
+| `ValidationProfile` | `nvarchar(100)` | The rules used, such as `ISOCodex.Addressing.GB`, `ISOCodex.Addressing.Spain`, or `GenericFallback`. |
+| `ValidatedAt` | `datetimeoffset` | When validation last ran. |
+| `ValidationIssuesJson` | `nvarchar(max)` | Serialized `AddressValidationIssue` values when validation fails. |
+
+Suggested status meanings:
+
+- `NotValidated` - the address has been saved, but no validation result is recorded
+- `Valid` - the address passed the recorded validation profile
+- `Invalid` - validation ran and returned one or more issues
+- `AcceptedUnverified` - the address was accepted without country-specific proof, commonly through a generic fallback
+
+Example validation issue payload:
+
+```json
+[
+  {
+    "code": "Address.PostalCode.Invalid",
+    "propertyName": "PostalCode",
+    "message": "PostalCode must be a valid GB postcode (e.g., SW1A 1AA)."
+  }
+]
+```
+
+`ValidationProfile` should be specific enough for the application to understand what the result means later. If validation freshness matters, include a package or rules version in that value, for example `ISOCodex.Addressing.GB@1.0.0-alpha.3`.
+
+This metadata is application state, so it is not part of the `Address` value object. Store it with the owning entity or address record when your workflow needs to distinguish saved, validated, failed, and accepted-unverified addresses.
 
 ## Built-in countries
 
