@@ -15,7 +15,7 @@ public class CAAddressValidatorTests
             "Ottawa",
             "ON",
             new PostalCode("K1A 0A9"),
-            CountryCode.Parse("CA"));
+            CountryCode.CA);
 
         _validator.Validate(address);
     }
@@ -29,7 +29,7 @@ public class CAAddressValidatorTests
             "Ottawa",
             "ON",
             new PostalCode("k1a0a9"),
-            CountryCode.Parse("CA"));
+            CountryCode.CA);
 
         _validator.Validate(address);
 
@@ -45,7 +45,7 @@ public class CAAddressValidatorTests
             "Ottawa",
             "XX",
             new PostalCode("K1A 0A9"),
-            CountryCode.Parse("CA"));
+            CountryCode.CA);
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));
     }

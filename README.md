@@ -31,9 +31,9 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 
 services.AddAddressing(
-    CountryCode.Parse("GB"),
-    CountryCode.Parse("US"),
-    CountryCode.Parse("CA"));
+    CountryCode.GB,
+    CountryCode.US,
+    CountryCode.CA);
 
 using var serviceProvider = services.BuildServiceProvider();
 
@@ -45,7 +45,7 @@ var address = new Address(
     city: "London",
     stateOrProvince: null,
     postalCode: new PostalCode("SW1A 2AA"),
-    countryCode: CountryCode.Parse("GB"));
+    countryCode: CountryCode.GB);
 
 validatorFactory.GetValidator(address.CountryCode).Validate(address);
 ```

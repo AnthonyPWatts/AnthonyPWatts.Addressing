@@ -10,9 +10,9 @@ public class AddressValidatorFactoryTests
         var factory = new AddressValidatorFactory();
         var validator = new TestAddressValidator();
 
-        factory.RegisterValidator(CountryCode.Parse("GB"), validator);
+        factory.RegisterValidator(CountryCode.GB, validator);
 
-        var result = factory.GetValidator(CountryCode.Parse("GB"));
+        var result = factory.GetValidator(CountryCode.GB);
 
         Assert.Same(validator, result);
     }
@@ -23,7 +23,7 @@ public class AddressValidatorFactoryTests
         var factory = new AddressValidatorFactory();
 
         var ex = Assert.Throws<InvalidOperationException>(
-            () => factory.GetValidator(CountryCode.Parse("GB")));
+            () => factory.GetValidator(CountryCode.GB));
 
         Assert.Contains("GB", ex.Message);
     }

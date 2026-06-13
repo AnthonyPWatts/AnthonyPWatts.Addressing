@@ -11,7 +11,7 @@ public class AddressTests
             "London",
             null,
             new PostalCode("SW1A 2AA"),
-            CountryCode.Parse("GB")));
+            CountryCode.GB));
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class AddressTests
             null!,
             null,
             new PostalCode("SW1A 2AA"),
-            CountryCode.Parse("GB")));
+            CountryCode.GB));
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class AddressTests
             "London",
             null,
             new PostalCode("SW1A 2AA"),
-            CountryCode.Parse("GB"));
+            CountryCode.GB);
 
         Assert.Equal("10 Downing St", address.Line1);
         Assert.Equal("London", address.City);

@@ -14,7 +14,7 @@ var spanishAddress = new Address(
     "Madrid",
     null,
     new PostalCode("28001"),
-    CountryCode.Parse("ES"));
+    CountryCode.ES);
 
 addressValidatorFactory.GetValidator(spanishAddress.CountryCode).Validate(spanishAddress);
 Console.WriteLine("Spanish address is valid!");
@@ -25,7 +25,7 @@ var ukAddress = new Address(
     "London",
     null,
     new PostalCode("SW1A 2AA"),
-    CountryCode.Parse("GB"));
+    CountryCode.GB);
 
 addressValidatorFactory.GetValidator(ukAddress.CountryCode).Validate(ukAddress);
 Console.WriteLine("UK address is valid!");
@@ -36,7 +36,7 @@ static IServiceProvider BuildAddressingServiceProvider()
 {
     var services = new ServiceCollection();
 
-    services.AddAddressing(CountryCode.Parse("GB"), CountryCode.Parse("US"));
+    services.AddAddressing(CountryCode.GB, CountryCode.US);
     services.AddSpainAddressing();
 
     return services.BuildServiceProvider();

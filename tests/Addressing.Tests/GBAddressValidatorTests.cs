@@ -15,7 +15,7 @@ public class GBAddressValidatorTests
             "London",
             null,
             new PostalCode("SW1A 2AA"),
-            CountryCode.Parse("GB"));
+            CountryCode.GB);
 
         _validator.Validate(address);
     }
@@ -29,7 +29,7 @@ public class GBAddressValidatorTests
             "London",
             null,
             new PostalCode("sw1a2aa"),
-            CountryCode.Parse("GB"));
+            CountryCode.GB);
 
         _validator.Validate(address);
 
@@ -45,7 +45,7 @@ public class GBAddressValidatorTests
             "London",
             null,
             new PostalCode("BADCODE"),
-            CountryCode.Parse("GB"));
+            CountryCode.GB);
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));
     }

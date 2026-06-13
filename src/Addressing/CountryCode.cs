@@ -8,6 +8,14 @@ namespace ISOCodex.Addressing
     {
         public string Code { get; }
 
+        public static CountryCode CA => new CountryCode("CA");
+
+        public static CountryCode ES => new CountryCode("ES");
+
+        public static CountryCode GB => new CountryCode("GB");
+
+        public static CountryCode US => new CountryCode("US");
+
         private CountryCode(string code)
         {
             Code = code.ToUpperInvariant();

@@ -7,7 +7,7 @@ namespace ISOCodex.Addressing.Spain
         public static IServiceCollection AddSpainAddressing(this IServiceCollection services)
         {
             return services.AddAddressValidator(
-                CountryCode.Parse("ES"),
+                CountryCode.ES,
                 () => new SpanishAddressValidator());
         }
     }

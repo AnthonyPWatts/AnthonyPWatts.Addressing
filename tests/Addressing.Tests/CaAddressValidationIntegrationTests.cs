@@ -9,7 +9,7 @@ public class CaAddressValidationIntegrationTests
     public void AddAddressing_WithCa_AllowsValidationOfCaAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.Parse("CA"));
+        services.AddAddressing(CountryCode.CA);
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
@@ -20,7 +20,7 @@ public class CaAddressValidationIntegrationTests
             "Ottawa",
             "ON",
             new PostalCode("K1A 0A9"),
-            CountryCode.Parse("CA"));
+            CountryCode.CA);
 
         factory.GetValidator(address.CountryCode).Validate(address);
     }

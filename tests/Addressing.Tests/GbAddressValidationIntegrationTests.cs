@@ -9,7 +9,7 @@ public class GbAddressValidationIntegrationTests
     public void AddAddressing_WithGb_AllowsValidationOfGbAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.Parse("GB"));
+        services.AddAddressing(CountryCode.GB);
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
@@ -20,7 +20,7 @@ public class GbAddressValidationIntegrationTests
             "London",
             null,
             new PostalCode("SW1A 2AA"),
-            CountryCode.Parse("GB"));
+            CountryCode.GB);
 
         factory.GetValidator(address.CountryCode).Validate(address);
     }

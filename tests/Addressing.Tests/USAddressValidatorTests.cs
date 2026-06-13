@@ -15,7 +15,7 @@ public class USAddressValidatorTests
             "Washington",
             "DC",
             new PostalCode("20500"),
-            CountryCode.Parse("US"));
+            CountryCode.US);
 
         _validator.Validate(address);
     }
@@ -29,7 +29,7 @@ public class USAddressValidatorTests
             "Washington",
             null,
             new PostalCode("20500"),
-            CountryCode.Parse("US"));
+            CountryCode.US);
 
         Assert.Throws<ArgumentException>(() => _validator.Validate(address));
     }

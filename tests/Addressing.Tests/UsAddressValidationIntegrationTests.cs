@@ -9,7 +9,7 @@ public class UsAddressValidationIntegrationTests
     public void AddAddressing_WithUs_AllowsValidationOfUsAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.Parse("US"));
+        services.AddAddressing(CountryCode.US);
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
@@ -20,7 +20,7 @@ public class UsAddressValidationIntegrationTests
             "Washington",
             "DC",
             new PostalCode("20500"),
-            CountryCode.Parse("US"));
+            CountryCode.US);
 
         factory.GetValidator(address.CountryCode).Validate(address);
     }
