@@ -46,54 +46,96 @@ namespace ISOCodex.Addressing.Spain
                 { "51", "Ceuta" }, { "52", "Melilla" }
             };
 
-        public void Validate(Address address)
+        public AddressValidationResult Validate(Address? address)
         {
+            var issues = new List<AddressValidationIssue>();
+
+            AddCommonIssues(issues, address);
+
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address), "Address cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.Line1))
-            {
-                throw new ArgumentException("Line1 cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.City))
-            {
-                throw new ArgumentException("City cannot be null or empty.");
-            }
-
-            if (address.CountryCode.Code != "ES")
-            {
-                throw new ArgumentException("CountryCode must be 'ES' for Spanish addresses.");
+                return new AddressValidationResult(issues);
             }
 
             if (!PostalCodeRegex.IsMatch(address.PostalCode.Code))
             {
-                throw new ArgumentException(
-                    "PostalCode must be a 5-digit number for Spanish addresses.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.Invalid",
+                    "PostalCode must be a 5-digit number for Spanish addresses.",
+                    nameof(Address.PostalCode)));
             }
 
             if (!string.IsNullOrWhiteSpace(address.StateOrProvince) &&
                 !ValidProvinces.Contains(address.StateOrProvince))
             {
-                throw new ArgumentException(
-                    $"StateOrProvince '{address.StateOrProvince}' is not a valid Spanish province.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.StateOrProvince.Invalid",
+                    $"StateOrProvince '{address.StateOrProvince}' is not a valid Spanish province.",
+                    nameof(Address.StateOrProvince)));
+            }
+
+            if (!PostalCodeRegex.IsMatch(address.PostalCode.Code))
+            {
+                return new AddressValidationResult(issues);
             }
 
             var postalCodePrefix = address.PostalCode.Code.Substring(0, 2);
 
             if (!PostalCodeToProvince.TryGetValue(postalCodePrefix, out var expectedProvince))
             {
-                throw new ArgumentException(
-                    $"PostalCode '{address.PostalCode.Code}' is not valid for any known Spanish province.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.ProvinceUnknown",
+                    $"PostalCode '{address.PostalCode.Code}' is not valid for any known Spanish province.",
+                    nameof(Address.PostalCode)));
             }
 
             if (!string.IsNullOrWhiteSpace(address.StateOrProvince) &&
+                expectedProvince != null &&
                 !string.Equals(address.StateOrProvince, expectedProvince, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException(
-                    $"PostalCode '{address.PostalCode.Code}' does not match the provided StateOrProvince '{address.StateOrProvince}'.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.ProvinceMismatch",
+                    $"PostalCode '{address.PostalCode.Code}' does not match the provided StateOrProvince '{address.StateOrProvince}'.",
+                    nameof(Address.PostalCode)));
+            }
+
+            return new AddressValidationResult(issues);
+        }
+
+        private static void AddCommonIssues(
+            ICollection<AddressValidationIssue> issues,
+            Address? address)
+        {
+            if (address == null)
+            {
+                issues.Add(new AddressValidationIssue(
+                    "Address.Required",
+                    "Address cannot be null."));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(address.Line1))
+            {
+                issues.Add(new AddressValidationIssue(
+                    "Address.Line1.Required",
+                    "Line1 cannot be null or empty.",
+                    nameof(Address.Line1)));
+            }
+
+            if (string.IsNullOrWhiteSpace(address.City))
+            {
+                issues.Add(new AddressValidationIssue(
+                    "Address.City.Required",
+                    "City cannot be null or empty.",
+                    nameof(Address.City)));
+            }
+
+            if (address.CountryCode != CountryCode.ES)
+            {
+                issues.Add(new AddressValidationIssue(
+                    "Address.CountryCode.Invalid",
+                    "CountryCode must be 'ES' for Spanish addresses.",
+                    nameof(Address.CountryCode)));
             }
         }
     }

@@ -30,8 +30,9 @@ public class AddressValidatorFactoryTests
 
     private sealed class TestAddressValidator : IAddressValidator
     {
-        public void Validate(Address address)
+        public AddressValidationResult Validate(Address? address)
         {
+            return AddressValidationResult.Success;
         }
     }
 }

@@ -39,10 +39,22 @@ var address = new Address(
     postalCode: new PostalCode("28013"),
     countryCode: CountryCode.ES);
 
-validatorFactory.GetValidator(CountryCode.ES).Validate(address);
+var validationResult = validatorFactory
+    .GetValidator(CountryCode.ES)
+    .Validate(address);
 
 var formatted = formatter.Format(address);
 ```
+
+Validation returns structured issue data:
+
+```csharp
+var result = validatorFactory
+    .GetValidator(CountryCode.ES)
+    .Validate(address);
+```
+
+For invalid Spanish addresses, issues include codes such as `Address.PostalCode.Invalid`, `Address.StateOrProvince.Invalid`, and `Address.PostalCode.ProvinceMismatch`.
 
 Default formatted output:
 

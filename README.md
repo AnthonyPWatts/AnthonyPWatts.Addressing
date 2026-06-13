@@ -49,7 +49,9 @@ var address = new Address(
     postalCode: new PostalCode("SW1A 2AA"),
     countryCode: CountryCode.GB);
 
-validatorFactory.GetValidator(address.CountryCode).Validate(address);
+var validationResult = validatorFactory
+    .GetValidator(address.CountryCode)
+    .Validate(address);
 
 var formatted = formatter.Format(address);
 ```
@@ -104,6 +106,26 @@ var withoutCountry = formatter.Format(
 ```
 
 Formatting is presentation only. It does not validate the address, normalize the stored postal code, or prove the address exists. Use the validator for country-specific validation before formatting when correctness matters.
+
+## Structured validation results
+
+`Validate(...)` returns structured, form/API-friendly errors instead of throwing for ordinary validation failures:
+
+```csharp
+var result = validatorFactory
+    .GetValidator(address.CountryCode)
+    .Validate(address);
+
+if (!result.IsValid)
+{
+    foreach (var issue in result.Issues)
+    {
+        Console.WriteLine($"{issue.PropertyName}: {issue.Message}");
+    }
+}
+```
+
+Each issue includes a stable `Code`, a human-readable `Message`, and an optional `PropertyName`.
 
 ## Built-in countries
 

@@ -18,45 +18,40 @@ namespace ISOCodex.Addressing.Validation.Validators
                 "WI","WY","DC","AS","GU","MP","PR","VI"
             };
 
-        public void Validate(Address address)
+        public AddressValidationResult Validate(Address? address)
         {
+            var issues = new List<AddressValidationIssue>();
+            AddressValidationIssues.AddCommonIssues(issues, address, CountryCode.US, "US");
+
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address), "Address cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.Line1))
-            {
-                throw new ArgumentException("Line1 cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.City))
-            {
-                throw new ArgumentException("City cannot be null or empty.");
-            }
-
-            if (address.CountryCode.Code != "US")
-            {
-                throw new ArgumentException("CountryCode must be 'US' for US addresses.");
+                return new AddressValidationResult(issues);
             }
 
             if (!ZipCodeRegex.IsMatch(address.PostalCode.Code.Trim()))
             {
-                throw new ArgumentException(
-                    "PostalCode must be a valid US ZIP code (e.g., 12345 or 12345-6789).");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.Invalid",
+                    "PostalCode must be a valid US ZIP code (e.g., 12345 or 12345-6789).",
+                    nameof(Address.PostalCode)));
             }
 
             if (string.IsNullOrWhiteSpace(address.StateOrProvince))
             {
-                throw new ArgumentException(
-                    "StateOrProvince cannot be null or empty for US addresses.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.StateOrProvince.Required",
+                    "StateOrProvince cannot be null or empty for US addresses.",
+                    nameof(Address.StateOrProvince)));
+            }
+            else if (!ValidStates.Contains(address.StateOrProvince))
+            {
+                issues.Add(new AddressValidationIssue(
+                    "Address.StateOrProvince.Invalid",
+                    $"StateOrProvince '{address.StateOrProvince}' is not a valid US state or territory.",
+                    nameof(Address.StateOrProvince)));
             }
 
-            if (!ValidStates.Contains(address.StateOrProvince))
-            {
-                throw new ArgumentException(
-                    $"StateOrProvince '{address.StateOrProvince}' is not a valid US state or territory.");
-            }
+            return new AddressValidationResult(issues);
         }
     }
 }

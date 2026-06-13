@@ -16,42 +16,36 @@ namespace ISOCodex.Addressing.Validation.Validators
                 "AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"
             };
 
-        public void Validate(Address address)
+        public AddressValidationResult Validate(Address? address)
         {
+            var issues = new List<AddressValidationIssue>();
+            AddressValidationIssues.AddCommonIssues(issues, address, CountryCode.CA, "CA");
+
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address), "Address cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.Line1))
-            {
-                throw new ArgumentException("Line1 cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.City))
-            {
-                throw new ArgumentException("City cannot be null or empty.");
-            }
-
-            if (address.CountryCode.Code != "CA")
-            {
-                throw new ArgumentException("CountryCode must be 'CA' for CA addresses.");
+                return new AddressValidationResult(issues);
             }
 
             var normalizedPostalCode = NormalizePostalCode(address.PostalCode.Code);
 
             if (!PostalCodeRegex.IsMatch(normalizedPostalCode))
             {
-                throw new ArgumentException(
-                    "PostalCode must be a valid CA postal code (e.g., A1A 1A1).");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.Invalid",
+                    "PostalCode must be a valid CA postal code (e.g., A1A 1A1).",
+                    nameof(Address.PostalCode)));
             }
 
             if (!string.IsNullOrWhiteSpace(address.StateOrProvince)
                 && !ValidProvinces.Contains(address.StateOrProvince))
             {
-                throw new ArgumentException(
-                    $"StateOrProvince '{address.StateOrProvince}' is not a valid CA province or territory.");
+                issues.Add(new AddressValidationIssue(
+                    "Address.StateOrProvince.Invalid",
+                    $"StateOrProvince '{address.StateOrProvince}' is not a valid CA province or territory.",
+                    nameof(Address.StateOrProvince)));
             }
+
+            return new AddressValidationResult(issues);
         }
 
         private static string NormalizePostalCode(string postalCode)

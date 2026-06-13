@@ -27,6 +27,8 @@ dotnet add package ISOCodex.Addressing
 - `CountryCode`
 - `PostalCode`
 - `IAddressFormatter`
+- `AddressValidationResult`
+- `AddressValidationIssue`
 - `IAddressValidator`
 - `IAddressValidatorFactory`
 
@@ -66,8 +68,35 @@ var address = new Address(
     postalCode: new PostalCode("SW1A 2AA"),
     countryCode: CountryCode.GB);
 
-validatorFactory.GetValidator(address.CountryCode).Validate(address);
+var result = validatorFactory
+    .GetValidator(address.CountryCode)
+    .Validate(address);
+
+if (!result.IsValid)
+{
+    foreach (var issue in result.Issues)
+    {
+        Console.WriteLine(issue.Code);
+        Console.WriteLine(issue.PropertyName);
+        Console.WriteLine(issue.Message);
+    }
+}
 ```
+
+`Validate(...)` does not throw for ordinary validation failures. It returns structured issue data for APIs, forms, imports, and other user-facing workflows.
+
+`AddressValidationResult` contains:
+
+- `IsValid` - `true` when no issues were found
+- `Issues` - a list of `AddressValidationIssue`
+
+Each `AddressValidationIssue` contains:
+
+- `Code` - stable machine-readable issue code, for example `Address.PostalCode.Invalid`
+- `Message` - human-readable description
+- `PropertyName` - related `Address` property when applicable
+
+Built-in validators collect multiple issues where possible.
 
 ## Format an address
 

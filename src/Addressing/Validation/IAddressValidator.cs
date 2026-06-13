@@ -2,6 +2,6 @@ namespace ISOCodex.Addressing.Validation
 {
     public interface IAddressValidator
     {
-        void Validate(Address address);
+        AddressValidationResult Validate(Address? address);
     }
 }

@@ -22,6 +22,8 @@ public class CaAddressValidationIntegrationTests
             new PostalCode("K1A 0A9"),
             CountryCode.CA);
 
-        factory.GetValidator(address.CountryCode).Validate(address);
+        var result = factory.GetValidator(address.CountryCode).Validate(address);
+
+        Assert.True(result.IsValid);
     }
 }

@@ -22,6 +22,8 @@ public class UsAddressValidationIntegrationTests
             new PostalCode("20500"),
             CountryCode.US);
 
-        factory.GetValidator(address.CountryCode).Validate(address);
+        var result = factory.GetValidator(address.CountryCode).Validate(address);
+
+        Assert.True(result.IsValid);
     }
 }

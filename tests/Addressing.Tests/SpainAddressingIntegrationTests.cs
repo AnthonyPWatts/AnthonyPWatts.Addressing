@@ -26,7 +26,36 @@ public class SpainAddressingIntegrationTests
             new PostalCode("28013"),
             CountryCode.ES);
 
-        factory.GetValidator(CountryCode.ES).Validate(address);
+        var result = factory.GetValidator(CountryCode.ES).Validate(address);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void AddSpainAddressing_ValidatorReturnsStructuredIssues()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAddressing();
+        services.AddSpainAddressing();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+
+        var address = new Address(
+            "Calle Mayor 1",
+            null,
+            "Madrid",
+            "Barcelona",
+            new PostalCode("28013"),
+            CountryCode.ES);
+
+        var result = factory.GetValidator(CountryCode.ES).Validate(address);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(
+            result.Issues,
+            issue => issue.Code == "Address.PostalCode.ProvinceMismatch");
     }
 
     [Fact]

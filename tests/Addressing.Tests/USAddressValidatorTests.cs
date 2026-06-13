@@ -7,7 +7,7 @@ public class USAddressValidatorTests
     private readonly USAddressValidator _validator = new();
 
     [Fact]
-    public void Validate_WithValidAddress_DoesNotThrow()
+    public void Validate_WithValidAddress_ReturnsValidResult()
     {
         var address = new Address(
             "1600 Pennsylvania Avenue NW",
@@ -17,11 +17,13 @@ public class USAddressValidatorTests
             new PostalCode("20500"),
             CountryCode.US);
 
-        _validator.Validate(address);
+        var result = _validator.Validate(address);
+
+        Assert.True(result.IsValid);
     }
 
     [Fact]
-    public void Validate_WithoutState_Throws()
+    public void Validate_WithoutState_ReturnsIssue()
     {
         var address = new Address(
             "1600 Pennsylvania Avenue NW",
@@ -31,6 +33,11 @@ public class USAddressValidatorTests
             new PostalCode("20500"),
             CountryCode.US);
 
-        Assert.Throws<ArgumentException>(() => _validator.Validate(address));
+        var result = _validator.Validate(address);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(
+            result.Issues,
+            issue => issue.Code == "Address.StateOrProvince.Required");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace ISOCodex.Addressing.Validation.Validators
@@ -9,35 +10,27 @@ namespace ISOCodex.Addressing.Validation.Validators
             @"^(GIR 0AA|[A-Z]{1,2}[0-9][0-9A-Z]? [0-9][A-Z]{2})$",
             RegexOptions.Compiled);
 
-        public void Validate(Address address)
+        public AddressValidationResult Validate(Address? address)
         {
+            var issues = new List<AddressValidationIssue>();
+            AddressValidationIssues.AddCommonIssues(issues, address, CountryCode.GB, "GB");
+
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address), "Address cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.Line1))
-            {
-                throw new ArgumentException("Line1 cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(address.City))
-            {
-                throw new ArgumentException("City cannot be null or empty.");
-            }
-
-            if (address.CountryCode.Code != "GB")
-            {
-                throw new ArgumentException("CountryCode must be 'GB' for GB addresses.");
+                return new AddressValidationResult(issues);
             }
 
             var normalizedPostcode = NormalizePostcode(address.PostalCode.Code);
 
             if (!PostcodeRegex.IsMatch(normalizedPostcode))
             {
-                throw new ArgumentException(
-                    "PostalCode must be a valid GB postcode (e.g., SW1A 1AA).");
+                issues.Add(new AddressValidationIssue(
+                    "Address.PostalCode.Invalid",
+                    "PostalCode must be a valid GB postcode (e.g., SW1A 1AA).",
+                    nameof(Address.PostalCode)));
             }
+
+            return new AddressValidationResult(issues);
         }
 
         private static string NormalizePostcode(string postcode)

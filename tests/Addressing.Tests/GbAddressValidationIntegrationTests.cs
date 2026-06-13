@@ -22,6 +22,8 @@ public class GbAddressValidationIntegrationTests
             new PostalCode("SW1A 2AA"),
             CountryCode.GB);
 
-        factory.GetValidator(address.CountryCode).Validate(address);
+        var result = factory.GetValidator(address.CountryCode).Validate(address);
+
+        Assert.True(result.IsValid);
     }
 }
