@@ -54,6 +54,75 @@ public class AddressFormatterTests
     }
 
     [Fact]
+    public void Format_WithLine2_IncludesLine2()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.GB, new GBAddressFormatter());
+
+        var address = new Address(
+            "Buckingham Palace",
+            "The Mall",
+            "London",
+            null,
+            new PostalCode("SW1A 1AA"),
+            CountryCode.GB);
+
+        var result = formatter.Format(address);
+
+        Assert.Equal(
+            "Buckingham Palace\nThe Mall\nLondon\nSW1A 1AA\nUnited Kingdom",
+            result);
+    }
+
+    [Fact]
+    public void Format_WithWhiteSpaceLine2_SkipsLine2()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.GB, new GBAddressFormatter());
+
+        var address = new Address(
+            "10 Downing Street",
+            "   ",
+            "London",
+            null,
+            new PostalCode("SW1A 2AA"),
+            CountryCode.GB);
+
+        var result = formatter.Format(address);
+
+        Assert.Equal(
+            "10 Downing Street\nLondon\nSW1A 2AA\nUnited Kingdom",
+            result);
+    }
+
+    [Fact]
+    public void Format_WithCustomSingleLineSeparator_UsesSeparator()
+    {
+        var formatter = new AddressFormatter();
+        formatter.RegisterFormatter(CountryCode.US, new USAddressFormatter());
+
+        var address = new Address(
+            "1600 Pennsylvania Avenue NW",
+            null,
+            "Washington",
+            "DC",
+            new PostalCode("20500"),
+            CountryCode.US);
+
+        var result = formatter.Format(
+            address,
+            new AddressFormatOptions
+            {
+                Style = AddressFormatStyle.SingleLine,
+                SingleLineSeparator = " | "
+            });
+
+        Assert.Equal(
+            "1600 Pennsylvania Avenue NW | Washington, DC 20500 | United States",
+            result);
+    }
+
+    [Fact]
     public void Format_WithIncludeCountryFalse_ExcludesCountry()
     {
         var formatter = new AddressFormatter();
@@ -75,6 +144,14 @@ public class AddressFormatterTests
             });
 
         Assert.Equal("111 Wellington Street\nOttawa ON K1A 0A9", result);
+    }
+
+    [Fact]
+    public void Format_WithNullAddress_ThrowsArgumentNullException()
+    {
+        var formatter = new AddressFormatter();
+
+        Assert.Throws<ArgumentNullException>(() => formatter.Format(null!));
     }
 
     [Fact]

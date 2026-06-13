@@ -72,7 +72,7 @@ The built-in formatter handles:
 - country-specific line ordering
 - optional second address lines
 - postal code placement
-- country names
+- English country display names
 - multi-line and single-line output
 
 For compact UI, logs, CSV exports, or search results, request a single-line format:
@@ -102,6 +102,8 @@ var withoutCountry = formatter.Format(
         IncludeCountry = false
     });
 ```
+
+Formatting is presentation only. It does not validate the address, normalize the stored postal code, or prove the address exists. Use the validator for country-specific validation before formatting when correctness matters.
 
 ## Built-in countries
 

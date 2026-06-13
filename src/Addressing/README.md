@@ -108,6 +108,8 @@ Ottawa ON K1A 0A9
 Canada
 ```
 
+Country names are currently emitted as English display names: `United Kingdom`, `United States`, `Canada`, and country names supplied by extension packages. Localization and alternate country-name output can be added later without changing the core routing model.
+
 ### Single-line formatting
 
 Single-line output is useful for grids, autocomplete results, logs, exports, and other compact displays:
@@ -137,6 +139,16 @@ var pipeSeparated = formatter.Format(
         Style = AddressFormatStyle.SingleLine,
         SingleLineSeparator = " | "
     });
+```
+
+`AddressFormatOptions` is mutable by design for straightforward call-site configuration:
+
+```csharp
+var options = new AddressFormatOptions
+{
+    Style = AddressFormatStyle.SingleLine,
+    IncludeCountry = false
+};
 ```
 
 ### Omitting the country
@@ -201,6 +213,8 @@ Country support can be extended through additional packages. Spain support is pr
 - Validation is performed by the country validator
 - Formatting is performed by the country formatter registered for `Address.CountryCode`
 - Formatting does not mutate the address
+- Formatting does not validate the address or prove that it exists
+- Built-in country names are currently English display names
 - Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
 - `AddAddressing(...)` only registers the built-in countries you explicitly request
 

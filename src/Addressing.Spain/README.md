@@ -56,6 +56,8 @@ Spain
 
 The Spanish formatter produces a postal-friendly layout using the core `IAddressFormatter` service. `AddSpainAddressing()` registers the Spanish formatter for `CountryCode.ES`, so consumers do not need to resolve Spain-specific services directly.
 
+The country name is currently emitted as the English display name `Spain`.
+
 Multi-line output:
 
 ```text
@@ -94,6 +96,8 @@ var localOnly = formatter.Format(
 Calle Mayor 1
 28013 Madrid
 ```
+
+Formatting is presentation only. It does not validate the address, normalize the stored postal code, or prove the address exists. Use the Spanish validator when validation matters.
 
 ## Validation behaviour
 
