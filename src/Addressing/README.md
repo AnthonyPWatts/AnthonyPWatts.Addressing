@@ -244,6 +244,47 @@ This is intended for store-first, import, migration, and validate-later workflow
 
 Generic fallbacks do not make `Address` freeform. The core model still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If your application must preserve addresses that do not fit that structure, store the raw address text separately in your own data model.
 
+## Recommended persistence shape
+
+The package does not prescribe a database schema, but consumers usually get the best results by storing the structured `Address` fields directly and keeping database constraints country-neutral.
+
+Persist value objects as strings:
+
+- `PostalCode.Code` -> `PostalCode`
+- `CountryCode.Code` -> `CountryCode`
+
+Suggested relational columns:
+
+| Column | Suggested type | Required | Notes |
+| --- | --- | --- | --- |
+| `Line1` | `nvarchar(200)` | Yes | First delivery/address line. |
+| `Line2` | `nvarchar(200)` | No | Apartment, suite, building, organization, or other secondary line. |
+| `City` | `nvarchar(100)` | Yes | Locality/town/city value used by the current `Address` model. |
+| `StateOrProvince` | `nvarchar(100)` | No | Region, province, state, county, department, prefecture, or equivalent. |
+| `PostalCode` | `nvarchar(32)` | Yes | Store the user's value; validators may normalize for checking without mutating this value. |
+| `CountryCode` | `char(2)` | Yes | ISO 3166-1 alpha-2 code, stored uppercase. |
+
+Recommended constraints:
+
+- `Line1`, `City`, `PostalCode`, and `CountryCode` should be required
+- `Line2` and `StateOrProvince` should be nullable
+- `CountryCode` should be exactly two uppercase ASCII letters
+- postal-code format should be validated in application code, not with database constraints
+- human-entered address fields should use Unicode string columns
+
+Example SQL shape:
+
+```sql
+Line1 nvarchar(200) not null,
+Line2 nvarchar(200) null,
+City nvarchar(100) not null,
+StateOrProvince nvarchar(100) null,
+PostalCode nvarchar(32) not null,
+CountryCode char(2) not null
+```
+
+These lengths are practical defaults rather than domain guarantees. Use wider columns when you need to preserve imported, legacy, or partner-provided address data exactly.
+
 ## Country-specific notes
 
 ### Great Britain (`GB`)
@@ -278,6 +319,7 @@ Country support can be extended through additional packages. Spain support is pr
 - Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
 - `AddAddressing(...)` only registers the built-in countries you explicitly request
 - `AddGenericAddressingFallbacks()` is opt-in and keeps registered country-specific services ahead of generic behaviour
+- Persistence should store `PostalCode.Code` and `CountryCode.Code` as strings
 
 ## License
 

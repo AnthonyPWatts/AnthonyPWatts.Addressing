@@ -161,6 +161,40 @@ FR
 
 Fallbacks do not make the `Address` model fully freeform. `Address` still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If an application needs to store addresses that cannot fit that structure, it should keep a separate raw/freeform field in its own persistence model.
 
+## Recommended persistence shape
+
+For relational storage, persist the value objects as strings and keep constraints aligned with the `Address` model rather than with one country's postal rules.
+
+| Column | Suggested type | Required | Notes |
+| --- | --- | --- | --- |
+| `Line1` | `nvarchar(200)` | Yes | First delivery/address line. |
+| `Line2` | `nvarchar(200)` | No | Apartment, suite, building, organization, or other secondary line. |
+| `City` | `nvarchar(100)` | Yes | Locality/town/city value used by the current `Address` model. |
+| `StateOrProvince` | `nvarchar(100)` | No | Region, province, state, county, department, prefecture, or equivalent. |
+| `PostalCode` | `nvarchar(32)` | Yes | Store the user's value; validators may normalize for checking without mutating this value. |
+| `CountryCode` | `char(2)` | Yes | ISO 3166-1 alpha-2 code, stored uppercase. |
+
+Recommended constraints:
+
+- require `Line1`, `City`, `PostalCode`, and `CountryCode`
+- allow `Line2` and `StateOrProvince` to be null
+- constrain `CountryCode` to exactly two uppercase ASCII letters
+- avoid country-specific postal-code constraints in the database
+- use Unicode string columns for human-entered address fields
+
+Example SQL shape:
+
+```sql
+Line1 nvarchar(200) not null,
+Line2 nvarchar(200) null,
+City nvarchar(100) not null,
+StateOrProvince nvarchar(100) null,
+PostalCode nvarchar(32) not null,
+CountryCode char(2) not null
+```
+
+These lengths are practical defaults, not package-enforced limits. Applications with legacy imports, unusually long organization names, or strict partner schemas can choose wider columns without changing how the library works.
+
 ## Built-in countries
 
 - Great Britain (`GB`)
