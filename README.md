@@ -26,6 +26,7 @@ dotnet add package ISOCodex.Addressing
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,6 +41,7 @@ using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 
 var address = new Address(
     line1: "10 Downing Street",
@@ -54,6 +56,7 @@ var validationResult = validatorFactory
     .Validate(address);
 
 var formatted = formatter.Format(address);
+var profile = profileProvider.GetProfile(address.CountryCode);
 ```
 
 `formatted` contains a postal-friendly, country-specific layout:
@@ -152,6 +155,20 @@ Applications can expose profile metadata to frontends as JSON if desired:
       "displayOrder": 60,
       "placeholder": "SW1A 2AA"
     }
+  ]
+}
+```
+
+For a US profile, the administrative-area field includes select-style options:
+
+```json
+{
+  "field": "AdministrativeArea",
+  "label": "State",
+  "inputKind": "Select",
+  "options": [
+    { "value": "CA", "label": "California" },
+    { "value": "DC", "label": "District of Columbia" }
   ]
 }
 ```
@@ -344,7 +361,7 @@ Example validation issue payload:
 ]
 ```
 
-`ValidationProfile` should be specific enough for the application to understand what the result means later. If validation freshness matters, include a package or rules version in that value, for example `ISOCodex.Addressing.GB@1.0.0-alpha.3`.
+`ValidationProfile` should be specific enough for the application to understand what the result means later. If validation freshness matters, include a package or rules version in that value, for example `ISOCodex.Addressing.GB@1.0.0-alpha.4`.
 
 This metadata is application state, so it is not part of the `Address` value object. Store it with the owning entity or address record when your workflow needs to distinguish saved, validated, failed, and accepted-unverified addresses.
 
@@ -365,6 +382,7 @@ dotnet add package ISOCodex.Addressing.Spain
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Spain;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -378,6 +396,7 @@ using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 ```
 
 ## Release focus

@@ -40,6 +40,7 @@ dotnet add package ISOCodex.Addressing
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -54,9 +55,10 @@ using var serviceProvider = services.BuildServiceProvider();
 
 var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
 var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
+var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 ```
 
-`AddAddressing(...)` registers both the formatter and validator for each requested built-in country.
+`AddAddressing(...)` registers the formatter, validator, and profile metadata for each requested built-in country.
 
 ## Validate an address
 
@@ -297,6 +299,20 @@ Applications can serialize profile metadata for a frontend:
 }
 ```
 
+Profiles can also include select-style options for administrative subdivisions:
+
+```json
+{
+  "field": "AdministrativeArea",
+  "label": "Province or territory",
+  "inputKind": "Select",
+  "options": [
+    { "value": "ON", "label": "Ontario" },
+    { "value": "NU", "label": "Nunavut" }
+  ]
+}
+```
+
 ### Omitting the country
 
 When the country is already shown elsewhere in your UI or data export, omit the country line:
@@ -434,7 +450,7 @@ Example issue payload:
 ]
 ```
 
-`ValidationProfile` should identify the rule set that produced the result. For workflows that care about stale validation, include a package or rules version, for example `ISOCodex.Addressing.GB@1.0.0-alpha.3`.
+`ValidationProfile` should identify the rule set that produced the result. For workflows that care about stale validation, include a package or rules version, for example `ISOCodex.Addressing.GB@1.0.0-alpha.4`.
 
 Keep this metadata outside the `Address` value object. It belongs to the consuming application's persistence or workflow state.
 

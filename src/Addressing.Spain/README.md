@@ -11,6 +11,8 @@
 
 The Spanish address profile includes province options on the administrative-area field. These options are form metadata for consumers; validation remains handled by `SpanishAddressValidator`.
 
+Profile consumers can inspect those options through `IAddressProfileProvider` and present them as a dropdown or send them to a frontend API. The profile does not replace validation, formatting, or application-specific localization.
+
 ## Prerequisites
 
 Register the core addressing services first.
