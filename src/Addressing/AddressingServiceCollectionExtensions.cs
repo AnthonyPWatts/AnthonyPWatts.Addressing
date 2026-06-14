@@ -11,20 +11,11 @@ namespace ISOCodex.Addressing
 {
     public static class AddressingServiceCollectionExtensions
     {
-        public static IServiceCollection AddAddressing(
-            this IServiceCollection services,
-            params CountryCode[] countries)
+        public static IServiceCollection AddAddressing(this IServiceCollection services)
         {
             services.TryAddAddressValidatorFactory();
             services.TryAddAddressFormatter();
             services.TryAddAddressProfileProvider();
-
-            foreach (var country in countries)
-            {
-                services.AddBuiltInAddressValidator(country);
-                services.AddBuiltInAddressFormatter(country);
-                services.AddBuiltInAddressProfile(country);
-            }
 
             return services;
         }
@@ -164,66 +155,6 @@ namespace ISOCodex.Addressing
             services.AddFallbackAddressProfile(() => AddressProfileDefaults.CreateGenericFallbackProfile());
 
             return services;
-        }
-
-        private static IServiceCollection AddBuiltInAddressValidator(
-            this IServiceCollection services,
-            CountryCode country)
-        {
-            switch (country.Code)
-            {
-                case "US":
-                    return services.AddAddressValidator(country, () => new USAddressValidator());
-                case "GB":
-                    return services.AddAddressValidator(country, () => new GBAddressValidator());
-                case "CA":
-                    return services.AddAddressValidator(country, () => new CAAddressValidator());
-                default:
-                    throw new ArgumentException(
-                        $"No validator available for country code '{country.Code}'.");
-            }
-        }
-
-        private static IServiceCollection AddBuiltInAddressFormatter(
-            this IServiceCollection services,
-            CountryCode country)
-        {
-            switch (country.Code)
-            {
-                case "US":
-                    return services.AddAddressFormatter(country, () => new USAddressFormatter());
-                case "GB":
-                    return services.AddAddressFormatter(country, () => new GBAddressFormatter());
-                case "CA":
-                    return services.AddAddressFormatter(country, () => new CAAddressFormatter());
-                default:
-                    throw new ArgumentException(
-                        $"No formatter available for country code '{country.Code}'.");
-            }
-        }
-
-        private static IServiceCollection AddBuiltInAddressProfile(
-            this IServiceCollection services,
-            CountryCode country)
-        {
-            switch (country.Code)
-            {
-                case "US":
-                    return services.AddAddressProfile(
-                        country,
-                        () => AddressProfileDefaults.CreateUnitedStatesProfile());
-                case "GB":
-                    return services.AddAddressProfile(
-                        country,
-                        () => AddressProfileDefaults.CreateGreatBritainProfile());
-                case "CA":
-                    return services.AddAddressProfile(
-                        country,
-                        () => AddressProfileDefaults.CreateCanadaProfile());
-                default:
-                    throw new ArgumentException(
-                        $"No profile available for country code '{country.Code}'.");
-            }
         }
 
         private static void TryAddAddressValidatorFactory(this IServiceCollection services)

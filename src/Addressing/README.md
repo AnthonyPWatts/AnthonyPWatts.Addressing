@@ -1,21 +1,18 @@
 # ISOCodex.Addressing
 
-`ISOCodex.Addressing` provides a small .NET domain model for postal addresses plus country-specific formatting and validation.
+`ISOCodex.Addressing` provides a small .NET domain model for postal addresses plus registries for country-specific formatting, validation, and profile metadata supplied by country packages.
 
 ## Features
 
 - ISO 3166-1 alpha-2 country code value object
 - Lightweight postal code value object
 - Address model suitable for application/domain use
-- Country-specific address formatting
+- Country-specific address formatting via extension packages
 - Country-specific validation via `IAddressValidator`
 - Country-specific address profile metadata via `IAddressProfileProvider`
-- DI registration for selected built-in formatters and validators
+- DI registration for validators, formatters, profile providers, and generic fallbacks
 - Opt-in generic fallbacks for valid ISO countries without country packs
-- Built-in support for:
-  - Great Britain (`GB`)
-  - United States (`US`)
-  - Canada (`CA`)
+- Zero built-in country rules; add country packages such as `ISOCodex.Addressing.GreatBritain`, `ISOCodex.Addressing.UnitedStates`, and `ISOCodex.Addressing.Canada`
 
 ## Installation
 
@@ -46,10 +43,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddAddressing(
-    CountryCode.GB,
-    CountryCode.US,
-    CountryCode.CA);
+services.AddAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();
 
@@ -58,7 +52,7 @@ var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 ```
 
-`AddAddressing(...)` registers the formatter, validator, and profile metadata for each requested built-in country.
+`AddAddressing()` registers the core factories and providers. Add country package extension methods when you need country-specific rules, for example `AddGreatBritainAddressing()` from `ISOCodex.Addressing.GreatBritain`.
 
 ## Validate an address
 
@@ -103,7 +97,7 @@ Each `AddressValidationIssue` contains:
 
 `AddressValidationIssue.Code` is intended for programmatic handling and should be treated as the stable machine-readable contract. `Message` is intended for display/logging and may be refined for clarity in future minor or patch releases.
 
-Built-in validators collect multiple issues where possible.
+Country validators collect multiple issues where possible.
 
 ## Use validation results with FluentValidation
 
@@ -191,7 +185,7 @@ United Kingdom
 
 The formatter uses `Address.CountryCode` to choose the correct country-specific formatter. That lets application code stay simple while each formatter owns its country's postal layout.
 
-The built-in countries currently format as:
+Country package formatters can produce layouts such as:
 
 ```text
 GB
@@ -274,7 +268,7 @@ foreach (var field in profile.Fields.OrderBy(field => field.DisplayOrder))
 }
 ```
 
-`AddAddressing(...)` registers country-specific profiles for the built-in `GB`, `US`, and `CA` countries you request. Extension packages can register their own profiles alongside their validators and formatters.
+Country packages register country-specific profiles alongside their validators and formatters. The core package registers no country-specific profiles by itself.
 
 Applications can serialize profile metadata for a frontend:
 
@@ -357,7 +351,7 @@ Country-specific services are still explicit by default. If no formatter or vali
 When an application needs to accept structured addresses for countries without a country pack, register generic fallbacks:
 
 ```csharp
-services.AddAddressing(CountryCode.GB);
+services.AddAddressing();
 services.AddGenericAddressingFallbacks();
 ```
 
@@ -494,9 +488,9 @@ For public APIs or storage contracts that should expose scalar strings, map to a
 - Province/territory is optional
 - If provided, province/territory must be a valid abbreviation
 
-## Extension packages
+## Country packages
 
-Country support can be extended through additional packages. Spain support is provided by the separate `ISOCodex.Addressing.Spain` project in the repository rather than by this core package.
+Country support is provided through additional packages. The current repository contains country packages for Great Britain, United States, Canada, Spain, Ireland, and France. This core package contains no country-specific rules by itself.
 
 ## Important behaviour
 
@@ -505,9 +499,9 @@ Country support can be extended through additional packages. Spain support is pr
 - Formatting is performed by the country formatter registered for `Address.CountryCode`
 - Formatting does not mutate the address
 - Formatting does not validate the address or prove that it exists
-- Built-in country names are currently English display names
+- Country package display names are currently English display names
 - Validators normalize common postal-code casing and spacing for validation without changing the stored `PostalCode.Code`
-- `AddAddressing(...)` only registers the built-in countries you explicitly request
+- `AddAddressing()` registers core services only; country packages register country-specific services
 - `AddGenericAddressingFallbacks()` is opt-in and keeps registered country-specific services ahead of generic behaviour
 - Persistence should store `PostalCode.Code` and `CountryCode.Code` as strings
 - Validation status is application state and should be stored separately from the `Address` value

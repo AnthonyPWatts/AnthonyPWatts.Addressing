@@ -1,3 +1,4 @@
+using ISOCodex.Addressing.Canada;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,8 @@ public class CaAddressValidationIntegrationTests
     public void AddAddressing_WithCa_AllowsValidationOfCaAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.CA);
+        services.AddAddressing();
+        services.AddCanadaAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();

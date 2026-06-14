@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\Addressing.GreatBritain\Addressing.GreatBritain.csproj" />
     <ProjectReference Include="..\src\Addressing.Spain\Addressing.Spain.csproj" />
+    <ProjectReference Include="..\src\Addressing.UnitedStates\Addressing.UnitedStates.csproj" />
     <ProjectReference Include="..\src\Addressing\Addressing.csproj" />
   </ItemGroup>
 </Project>

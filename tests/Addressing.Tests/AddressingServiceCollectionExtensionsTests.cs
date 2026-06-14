@@ -1,3 +1,6 @@
+using ISOCodex.Addressing.Canada;
+using ISOCodex.Addressing.GreatBritain;
+using ISOCodex.Addressing.UnitedStates;
 using ISOCodex.Addressing.Validation;
 using ISOCodex.Addressing.Validation.Validators;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,27 +10,25 @@ namespace ISOCodex.Addressing.Tests;
 public class AddressingServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddAddressing_WithGb_RegistersFactoryThatCanResolveGbValidator()
+    public void AddAddressing_RegistersFactory()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.GB);
+        services.AddAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
-        var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
-        var validator = factory.GetValidator(CountryCode.GB);
 
-        Assert.IsType<GBAddressValidator>(validator);
+        Assert.NotNull(serviceProvider.GetRequiredService<IAddressValidatorFactory>());
     }
 
     [Fact]
-    public void AddAddressing_WithUsGbCa_RegistersAllRequestedValidators()
+    public void CountryPacks_RegisterAllRequestedValidators()
     {
         var services = new ServiceCollection();
 
-        services.AddAddressing(
-            CountryCode.US,
-            CountryCode.GB,
-            CountryCode.CA);
+        services.AddAddressing();
+        services.AddUnitedStatesAddressing();
+        services.AddGreatBritainAddressing();
+        services.AddCanadaAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
@@ -38,12 +39,16 @@ public class AddressingServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddAddressing_WithUnsupportedCountry_ThrowsArgumentException()
+    public void AddAddressing_WithNoCountryPack_ThrowsWhenResolvingCountryValidator()
     {
         var services = new ServiceCollection();
+        services.AddAddressing();
 
-        var ex = Assert.Throws<ArgumentException>(
-            () => services.AddAddressing(CountryCode.ES));
+        using var serviceProvider = services.BuildServiceProvider();
+        var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();
+
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => factory.GetValidator(CountryCode.ES));
 
         Assert.Contains("ES", ex.Message);
     }
@@ -65,7 +70,8 @@ public class AddressingServiceCollectionExtensionsTests
     public void AddAddressing_WithGenericFallbacks_PrefersCountryValidator()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.GB);
+        services.AddAddressing();
+        services.AddGreatBritainAddressing();
         services.AddGenericAddressingFallbacks();
 
         using var serviceProvider = services.BuildServiceProvider();

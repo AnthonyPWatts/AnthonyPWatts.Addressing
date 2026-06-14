@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ISOCodex.Addressing.Validation;
 
-namespace ISOCodex.Addressing.Validation.Validators
+namespace ISOCodex.Addressing.GreatBritain
 {
     public class GBAddressValidator : IAddressValidator
     {

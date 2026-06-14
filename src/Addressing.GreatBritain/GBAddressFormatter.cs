@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using ISOCodex.Addressing.Formatting;
 
-namespace ISOCodex.Addressing.Formatting.Formatters
+namespace ISOCodex.Addressing.GreatBritain
 {
     public sealed class GBAddressFormatter : ICountryAddressFormatter
     {

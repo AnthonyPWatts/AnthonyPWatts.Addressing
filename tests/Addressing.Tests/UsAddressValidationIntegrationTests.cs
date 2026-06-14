@@ -1,3 +1,4 @@
+using ISOCodex.Addressing.UnitedStates;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,8 @@ public class UsAddressValidationIntegrationTests
     public void AddAddressing_WithUs_AllowsValidationOfUsAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.US);
+        services.AddAddressing();
+        services.AddUnitedStatesAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();

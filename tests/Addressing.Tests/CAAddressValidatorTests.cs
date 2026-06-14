@@ -1,4 +1,4 @@
-using ISOCodex.Addressing.Validation.Validators;
+using ISOCodex.Addressing.Canada;
 
 namespace ISOCodex.Addressing.Tests;
 

@@ -1,5 +1,8 @@
+using ISOCodex.Addressing.Canada;
 using ISOCodex.Addressing.Formatting;
 using ISOCodex.Addressing.Formatting.Formatters;
+using ISOCodex.Addressing.GreatBritain;
+using ISOCodex.Addressing.UnitedStates;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ISOCodex.Addressing.Tests;
@@ -216,7 +219,8 @@ public class AddressFormatterTests
     public void AddAddressing_WithGb_RegistersFormatter()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.GB);
+        services.AddAddressing();
+        services.AddGreatBritainAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
         var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();

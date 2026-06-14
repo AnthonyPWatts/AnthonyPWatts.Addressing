@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using ISOCodex.Addressing.Formatting;
 
-namespace ISOCodex.Addressing.Formatting.Formatters
+namespace ISOCodex.Addressing.UnitedStates
 {
-    public sealed class CAAddressFormatter : ICountryAddressFormatter
+    public sealed class USAddressFormatter : ICountryAddressFormatter
     {
         public string Format(Address address, AddressFormatOptions? options = null)
         {
@@ -16,11 +17,10 @@ namespace ISOCodex.Addressing.Formatting.Formatters
                 lines,
                 AddressFormatting.JoinParts(
                     " ",
-                    address.City,
-                    address.StateOrProvince,
+                    AddressFormatting.JoinParts(", ", address.City, address.StateOrProvince),
                     address.PostalCode.Code));
 
-            return AddressFormatting.FormatLines(lines, "Canada", options);
+            return AddressFormatting.FormatLines(lines, "United States", options);
         }
     }
 }

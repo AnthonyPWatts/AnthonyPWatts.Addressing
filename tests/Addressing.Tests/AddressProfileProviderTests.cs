@@ -1,7 +1,10 @@
 using System;
 using System.Linq;
+using ISOCodex.Addressing.Canada;
+using ISOCodex.Addressing.GreatBritain;
 using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Spain;
+using ISOCodex.Addressing.UnitedStates;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ISOCodex.Addressing.Tests;
@@ -136,7 +139,7 @@ public class AddressProfileProviderTests
     public void GetProfile_WithFallbackProfile_ReturnsGenericFallbackForRequestedCountry()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.GB);
+        services.AddAddressing();
         services.AddGenericAddressingFallbacks();
 
         using var serviceProvider = services.BuildServiceProvider();
@@ -274,7 +277,27 @@ public class AddressProfileProviderTests
     private static IAddressProfileProvider BuildProfileProvider(params CountryCode[] countries)
     {
         var services = new ServiceCollection();
-        services.AddAddressing(countries);
+        services.AddAddressing();
+
+        foreach (var country in countries)
+        {
+            if (country == CountryCode.GB)
+            {
+                services.AddGreatBritainAddressing();
+            }
+            else if (country == CountryCode.US)
+            {
+                services.AddUnitedStatesAddressing();
+            }
+            else if (country == CountryCode.CA)
+            {
+                services.AddCanadaAddressing();
+            }
+            else
+            {
+                throw new ArgumentException($"No test country pack registration for {country.Code}.", nameof(countries));
+            }
+        }
 
         using var serviceProvider = services.BuildServiceProvider();
 

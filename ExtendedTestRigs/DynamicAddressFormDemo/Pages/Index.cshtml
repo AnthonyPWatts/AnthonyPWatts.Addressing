@@ -1,0 +1,130 @@
+@page
+@using ISOCodex.Addressing.Profiles
+@model IndexModel
+@{
+    ViewData["Title"] = "Dynamic address form";
+}
+
+<div class="row g-4">
+    <section class="col-lg-7">
+        <form method="get" class="d-flex align-items-end gap-3 mb-3">
+            <div>
+                <label class="form-label" for="country">Country</label>
+                <select id="country" name="CountryCode" class="form-select" onchange="this.form.submit()">
+                    @foreach (var country in Model.Countries)
+                    {
+                        <option value="@country.Code" selected="@(country.Code == Model.CountryCode)">@country.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="sample">Sample</label>
+                <select id="sample" name="SampleId" class="form-select" onchange="this.form.submit()">
+                    <option value="">Blank form</option>
+                    @foreach (var sample in Model.Samples.Where(sample => sample.CountryCode == Model.CountryCode))
+                    {
+                        <option value="@sample.Id" selected="@(sample.Id == Model.SampleId)">@sample.Name</option>
+                    }
+                </select>
+            </div>
+        </form>
+
+        <form method="post" class="address-form">
+            <input type="hidden" asp-for="Input.CountryCode" value="@Model.CountryCode" />
+            @foreach (var field in Model.Profile.Fields.Where(field => field.IsUsed).OrderBy(field => field.DisplayOrder))
+            {
+                var inputName = field.Field switch
+                {
+                    AddressField.AddressLine1 => nameof(Model.Input.Line1),
+                    AddressField.AddressLine2 => nameof(Model.Input.Line2),
+                    AddressField.Locality => nameof(Model.Input.City),
+                    AddressField.AdministrativeArea => nameof(Model.Input.StateOrProvince),
+                    AddressField.PostalCode => nameof(Model.Input.PostalCode),
+                    AddressField.Country => nameof(Model.Input.CountryCode),
+                    _ => field.Field.ToString()
+                };
+                var fullName = $"Input.{inputName}";
+                var value = inputName switch
+                {
+                    nameof(Model.Input.Line1) => Model.Input.Line1,
+                    nameof(Model.Input.Line2) => Model.Input.Line2,
+                    nameof(Model.Input.City) => Model.Input.City,
+                    nameof(Model.Input.StateOrProvince) => Model.Input.StateOrProvince,
+                    nameof(Model.Input.PostalCode) => Model.Input.PostalCode,
+                    nameof(Model.Input.CountryCode) => Model.Input.CountryCode,
+                    _ => ""
+                };
+                var issueText = Model.IssueTextFor(inputName);
+
+                if (field.Field == AddressField.Country)
+                {
+                    <input type="hidden" name="@fullName" value="@Model.CountryCode" />
+                    continue;
+                }
+
+                <div class="mb-3">
+                    <label class="form-label" for="@inputName">@field.Label @(field.IsRequired ? "*" : "")</label>
+                    @if (field.InputKind == AddressFieldInputKind.Select)
+                    {
+                        <select id="@inputName" name="@fullName" class="form-select @(string.IsNullOrWhiteSpace(issueText) ? "" : "is-invalid")">
+                            <option value="">Select...</option>
+                            @foreach (var option in field.Options)
+                            {
+                                <option value="@option.Value" selected="@(option.Value == value)">@option.Label</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input id="@inputName" name="@fullName" value="@value" placeholder="@field.Placeholder" class="form-control @(string.IsNullOrWhiteSpace(issueText) ? "" : "is-invalid")" />
+                    }
+                    @if (!string.IsNullOrWhiteSpace(field.HelpText))
+                    {
+                        <div class="form-text">@field.HelpText</div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(issueText))
+                    {
+                        <div class="invalid-feedback d-block">@issueText</div>
+                    }
+                </div>
+            }
+
+            <button class="btn btn-primary" type="submit">Validate</button>
+        </form>
+    </section>
+
+    <aside class="col-lg-5">
+        <div class="mb-4">
+            <h2 class="h5">Validation status</h2>
+            <p class="mb-2">@Model.Status</p>
+            @if (Model.FieldIssues.Count > 0)
+            {
+                <ul class="list-group">
+                    @foreach (var issue in Model.FieldIssues)
+                    {
+                        <li class="list-group-item">
+                            <strong>@issue.Field</strong>: @issue.Code - @issue.Message
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="mb-4">
+            <h2 class="h5">Formatted preview</h2>
+            @if (Model.FormattedPreview is null)
+            {
+                <p class="text-muted">No valid address preview yet.</p>
+            }
+            else
+            {
+                <pre class="bg-light border rounded p-3">@Model.FormattedPreview</pre>
+            }
+        </div>
+
+        <div>
+            <h2 class="h5">Raw profile metadata</h2>
+            <pre class="bg-light border rounded p-3 profile-json">@Model.RawProfileJson</pre>
+        </div>
+    </aside>
+</div>

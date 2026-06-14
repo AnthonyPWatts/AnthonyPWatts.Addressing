@@ -1,3 +1,4 @@
+using ISOCodex.Addressing.GreatBritain;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,8 @@ public class GbAddressValidationIntegrationTests
     public void AddAddressing_WithGb_AllowsValidationOfGbAddress()
     {
         var services = new ServiceCollection();
-        services.AddAddressing(CountryCode.GB);
+        services.AddAddressing();
+        services.AddGreatBritainAddressing();
 
         using var serviceProvider = services.BuildServiceProvider();
         var factory = serviceProvider.GetRequiredService<IAddressValidatorFactory>();

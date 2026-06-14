@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace ISOCodex.Addressing.Validation
 {
-    internal static class AddressValidationIssues
+    public static class AddressValidationIssues
     {
         public static void AddCommonIssues(
             ICollection<AddressValidationIssue> issues,

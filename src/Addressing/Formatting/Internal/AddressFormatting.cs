@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ISOCodex.Addressing.Formatting
 {
-    internal static class AddressFormatting
+    public static class AddressFormatting
     {
         public static void AddIfNotWhiteSpace(ICollection<string> lines, string? value)
         {

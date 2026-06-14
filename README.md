@@ -4,25 +4,34 @@
 
 ## Projects
 
-- `src/Addressing` - core types, DI registration, built-in formatters, and built-in validators
-- `src/Addressing.Spain` - Spain extension package
-- `src/Addressing.Ireland` - Ireland extension package
-- `src/Addressing.France` - France extension package
+- `src/Addressing` - core types, DI registration, registries, generic fallback behaviours, and abstractions
+- `src/Addressing.GreatBritain` - Great Britain country package
+- `src/Addressing.UnitedStates` - United States country package
+- `src/Addressing.Canada` - Canada country package
+- `src/Addressing.Spain` - Spain country package
+- `src/Addressing.Ireland` - Ireland country package
+- `src/Addressing.France` - France country package
 - `tests/Addressing.Tests` - unit and integration-style tests
 - `ManualTestRig` - small console app for quick manual smoke testing
 
 ## Package identity
 
 - Core package: `ISOCodex.Addressing`
-- Spain extension package: `ISOCodex.Addressing.Spain`
-- Ireland extension package: `ISOCodex.Addressing.Ireland`
-- France extension package: `ISOCodex.Addressing.France`
+- Great Britain country package: `ISOCodex.Addressing.GreatBritain`
+- United States country package: `ISOCodex.Addressing.UnitedStates`
+- Canada country package: `ISOCodex.Addressing.Canada`
+- Spain country package: `ISOCodex.Addressing.Spain`
+- Ireland country package: `ISOCodex.Addressing.Ireland`
+- France country package: `ISOCodex.Addressing.France`
 - Root namespaces: `ISOCodex.Addressing*`
 
 ## Installation
 
 ```bash
 dotnet add package ISOCodex.Addressing
+dotnet add package ISOCodex.Addressing.GreatBritain
+dotnet add package ISOCodex.Addressing.UnitedStates
+dotnet add package ISOCodex.Addressing.Canada
 dotnet add package ISOCodex.Addressing.Spain
 dotnet add package ISOCodex.Addressing.Ireland
 dotnet add package ISOCodex.Addressing.France
@@ -33,16 +42,16 @@ dotnet add package ISOCodex.Addressing.France
 ```csharp
 using ISOCodex.Addressing;
 using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.GreatBritain;
 using ISOCodex.Addressing.Profiles;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddAddressing(
-    CountryCode.GB,
-    CountryCode.US,
-    CountryCode.CA);
+services
+    .AddAddressing()
+    .AddGreatBritainAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();
 
@@ -79,7 +88,7 @@ United Kingdom
 
 Formatting is routed by `Address.CountryCode`. Register the countries your app supports, then ask `IAddressFormatter` to produce display or output text for each address.
 
-The built-in formatter handles:
+Country package formatters handle:
 
 - country-specific line ordering
 - optional second address lines
@@ -123,7 +132,7 @@ Address profiles expose country-specific metadata that applications can use to b
 
 Profiles are metadata only. They do not render UI, validate an address, format an address, autocomplete addresses, geocode, or prove deliverability. They are framework-agnostic, so the same data can be used from ASP.NET, Blazor, React, console tools, APIs, imports, or custom validation pipelines.
 
-For countries with well-defined administrative subdivisions in the package, the administrative-area field can include selectable `Options`. The current built-in metadata includes options for US states and territories, Canadian provinces and territories, and Spanish provinces. GB counties intentionally remain a free-text optional field because county usage is not strict enough to model as a closed validation list.
+For countries with well-defined administrative subdivisions in the package, the administrative-area field can include selectable `Options`. Current country-pack metadata includes options for US states and territories, Canadian provinces and territories, and Spanish provinces. GB counties intentionally remain a free-text optional field because county usage is not strict enough to model as a closed validation list.
 
 ```csharp
 using ISOCodex.Addressing.Profiles;
@@ -137,7 +146,7 @@ foreach (var field in profile.Fields.OrderBy(field => field.DisplayOrder))
 }
 ```
 
-The built-in core profiles cover `GB`, `US`, and `CA` when those countries are registered with `AddAddressing(...)`. Spain, Ireland, and France contribute profiles from their extension packages when `AddSpainAddressing()`, `AddIrelandAddressing()`, or `AddFranceAddressing()` is called.
+Country packages contribute profiles when their DI extension methods are called, for example `AddGreatBritainAddressing()`, `AddUnitedStatesAddressing()`, `AddCanadaAddressing()`, `AddSpainAddressing()`, `AddIrelandAddressing()`, or `AddFranceAddressing()`.
 
 `AddGenericAddressingFallbacks()` also registers a conservative generic profile for unsupported ISO countries. The returned profile has `Source = AddressProfileSource.GenericFallback`, while country-pack-backed profiles use `AddressProfileSource.CountrySpecific`.
 
@@ -280,7 +289,9 @@ For applications that need to save and display structured addresses for countrie
 ```csharp
 var services = new ServiceCollection();
 
-services.AddAddressing(CountryCode.GB);
+services
+    .AddAddressing()
+    .AddGreatBritainAddressing();
 services.AddGenericAddressingFallbacks();
 ```
 
@@ -393,17 +404,21 @@ This metadata is application state, so it is not part of the `Address` value obj
 
 For public APIs or storage contracts that should expose scalar strings, map to an application DTO with `postalCode` and `countryCode` string properties.
 
-## Built-in countries
+## Country packages
 
-- Great Britain (`GB`)
-- United States (`US`)
-- Canada (`CA`)
+- Great Britain (`GB`) via `ISOCodex.Addressing.GreatBritain`
+- United States (`US`) via `ISOCodex.Addressing.UnitedStates`
+- Canada (`CA`) via `ISOCodex.Addressing.Canada`
+- Spain (`ES`) via `ISOCodex.Addressing.Spain`
+- Ireland (`IE`) via `ISOCodex.Addressing.Ireland`
+- France (`FR`) via `ISOCodex.Addressing.France`
 
-## Country extensions
-
-Spain, Ireland, and France support are delivered by separate country extension packages. Each package transitively depends on the core `ISOCodex.Addressing` package and registers country-specific validation, formatting, and profile metadata through its DI extension method.
+Each country package transitively depends on the core `ISOCodex.Addressing` package and registers country-specific validation, formatting, and profile metadata through its DI extension method.
 
 ```bash
+dotnet add package ISOCodex.Addressing.GreatBritain
+dotnet add package ISOCodex.Addressing.UnitedStates
+dotnet add package ISOCodex.Addressing.Canada
 dotnet add package ISOCodex.Addressing.Spain
 dotnet add package ISOCodex.Addressing.Ireland
 dotnet add package ISOCodex.Addressing.France
@@ -422,6 +437,7 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 
 services.AddAddressing();
+services.AddGreatBritainAddressing();
 services.AddSpainAddressing();
 
 using var serviceProvider = services.BuildServiceProvider();

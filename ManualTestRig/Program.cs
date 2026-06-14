@@ -1,5 +1,7 @@
 using ISOCodex.Addressing;
+using ISOCodex.Addressing.GreatBritain;
 using ISOCodex.Addressing.Spain;
+using ISOCodex.Addressing.UnitedStates;
 using ISOCodex.Addressing.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,8 +38,11 @@ static IServiceProvider BuildAddressingServiceProvider()
 {
     var services = new ServiceCollection();
 
-    services.AddAddressing(CountryCode.GB, CountryCode.US);
-    services.AddSpainAddressing();
+    services
+        .AddAddressing()
+        .AddGreatBritainAddressing()
+        .AddUnitedStatesAddressing()
+        .AddSpainAddressing();
 
     return services.BuildServiceProvider();
 }
