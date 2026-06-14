@@ -11,6 +11,8 @@ $outputPath = Join-Path $repoRoot $OutputDirectory
 $propsPath = Join-Path $repoRoot "Directory.Build.props"
 $packageProjectPaths = @(
     "src/Addressing/Addressing.csproj",
+    "src/Addressing.France/Addressing.France.csproj",
+    "src/Addressing.Ireland/Addressing.Ireland.csproj",
     "src/Addressing.Spain/Addressing.Spain.csproj"
 )
 
@@ -110,7 +112,10 @@ foreach ($package in $packages)
             throw "$($package.Name) does not contain a netstandard2.1 library"
         }
 
-        if ($package.Name -eq "ISOCodex.Addressing.Spain.$version.nupkg")
+        if ($package.Name -in @(
+            "ISOCodex.Addressing.France.$version.nupkg",
+            "ISOCodex.Addressing.Ireland.$version.nupkg",
+            "ISOCodex.Addressing.Spain.$version.nupkg"))
         {
             $nuspecEntry = $archive.GetEntry($nuspec)
 

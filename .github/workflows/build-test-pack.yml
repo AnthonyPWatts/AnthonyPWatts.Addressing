@@ -31,6 +31,12 @@ jobs:
       - name: Pack core package
         run: dotnet pack src/Addressing/Addressing.csproj --configuration Release --no-build -o ./artifacts
 
+      - name: Pack France package
+        run: dotnet pack src/Addressing.France/Addressing.France.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Pack Ireland package
+        run: dotnet pack src/Addressing.Ireland/Addressing.Ireland.csproj --configuration Release --no-build -o ./artifacts
+
       - name: Pack Spain package
         run: dotnet pack src/Addressing.Spain/Addressing.Spain.csproj --configuration Release --no-build -o ./artifacts
 

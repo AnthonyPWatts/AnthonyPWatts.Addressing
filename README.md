@@ -6,6 +6,8 @@
 
 - `src/Addressing` - core types, DI registration, built-in formatters, and built-in validators
 - `src/Addressing.Spain` - Spain extension package
+- `src/Addressing.Ireland` - Ireland extension package
+- `src/Addressing.France` - France extension package
 - `tests/Addressing.Tests` - unit and integration-style tests
 - `ManualTestRig` - small console app for quick manual smoke testing
 
@@ -13,6 +15,8 @@
 
 - Core package: `ISOCodex.Addressing`
 - Spain extension package: `ISOCodex.Addressing.Spain`
+- Ireland extension package: `ISOCodex.Addressing.Ireland`
+- France extension package: `ISOCodex.Addressing.France`
 - Root namespaces: `ISOCodex.Addressing*`
 
 ## Installation
@@ -20,6 +24,8 @@
 ```bash
 dotnet add package ISOCodex.Addressing
 dotnet add package ISOCodex.Addressing.Spain
+dotnet add package ISOCodex.Addressing.Ireland
+dotnet add package ISOCodex.Addressing.France
 ```
 
 ## Quick start
@@ -131,7 +137,7 @@ foreach (var field in profile.Fields.OrderBy(field => field.DisplayOrder))
 }
 ```
 
-The built-in core profiles cover `GB`, `US`, and `CA` when those countries are registered with `AddAddressing(...)`. Spain contributes its profile from the `ISOCodex.Addressing.Spain` package when `AddSpainAddressing()` is called.
+The built-in core profiles cover `GB`, `US`, and `CA` when those countries are registered with `AddAddressing(...)`. Spain, Ireland, and France contribute profiles from their extension packages when `AddSpainAddressing()`, `AddIrelandAddressing()`, or `AddFranceAddressing()` is called.
 
 `AddGenericAddressingFallbacks()` also registers a conservative generic profile for unsupported ISO countries. The returned profile has `Source = AddressProfileSource.GenericFallback`, while country-pack-backed profiles use `AddressProfileSource.CountrySpecific`.
 
@@ -393,13 +399,17 @@ For public APIs or storage contracts that should expose scalar strings, map to a
 - United States (`US`)
 - Canada (`CA`)
 
-## Spain extension
+## Country extensions
 
-Spain support is delivered by the separate `ISOCodex.Addressing.Spain` package.
+Spain, Ireland, and France support are delivered by separate country extension packages. Each package transitively depends on the core `ISOCodex.Addressing` package and registers country-specific validation, formatting, and profile metadata through its DI extension method.
 
 ```bash
 dotnet add package ISOCodex.Addressing.Spain
+dotnet add package ISOCodex.Addressing.Ireland
+dotnet add package ISOCodex.Addressing.France
 ```
+
+### Spain
 
 ```csharp
 using ISOCodex.Addressing;
@@ -420,6 +430,79 @@ var validatorFactory = serviceProvider.GetRequiredService<IAddressValidatorFacto
 var formatter = serviceProvider.GetRequiredService<IAddressFormatter>();
 var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
 ```
+
+### Ireland
+
+```csharp
+using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.Ireland;
+using ISOCodex.Addressing.Profiles;
+using ISOCodex.Addressing.Validation;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+
+services.AddAddressing();
+services.AddIrelandAddressing();
+
+using var serviceProvider = services.BuildServiceProvider();
+
+var address = new Address(
+    line1: "1 College Green",
+    line2: null,
+    city: "Dublin",
+    stateOrProvince: null,
+    postalCode: new PostalCode("D02 X285"),
+    countryCode: CountryCode.IE);
+```
+
+Default formatted Ireland output:
+
+```text
+1 College Green
+Dublin
+D02 X285
+Ireland
+```
+
+The Ireland validator accepts pragmatic Eircode shapes such as `D02 X285`, `D02X285`, and lowercase equivalents without mutating the stored postal code.
+
+### France
+
+```csharp
+using ISOCodex.Addressing;
+using ISOCodex.Addressing.Formatting;
+using ISOCodex.Addressing.France;
+using ISOCodex.Addressing.Profiles;
+using ISOCodex.Addressing.Validation;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+
+services.AddAddressing();
+services.AddFranceAddressing();
+
+using var serviceProvider = services.BuildServiceProvider();
+
+var address = new Address(
+    line1: "10 Rue de Rivoli",
+    line2: null,
+    city: "Paris",
+    stateOrProvince: null,
+    postalCode: new PostalCode("75001"),
+    countryCode: CountryCode.FR);
+```
+
+Default formatted France output:
+
+```text
+10 Rue de Rivoli
+75001 Paris
+France
+```
+
+The France validator currently applies conservative five-digit postal-code validation and does not attempt overseas territory, CEDEX, special-case, or city/postal-code cross-checking.
 
 ## Release focus
 

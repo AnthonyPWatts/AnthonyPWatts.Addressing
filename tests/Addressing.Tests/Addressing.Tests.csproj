@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Addressing\Addressing.csproj" />
+    <ProjectReference Include="..\..\src\Addressing.France\Addressing.France.csproj" />
+    <ProjectReference Include="..\..\src\Addressing.Ireland\Addressing.Ireland.csproj" />
     <ProjectReference Include="..\..\src\Addressing.Spain\Addressing.Spain.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <AssemblyName>ISOCodex.Addressing.France</AssemblyName>
+    <RootNamespace>ISOCodex.Addressing.France</RootNamespace>
+
+    <PackageId>ISOCodex.Addressing.France</PackageId>
+    <Description>France-specific extension package for ISOCodex.Addressing.</Description>
+    <PackageTags>address france postal-address iso3166 validation</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Addressing\Addressing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>true</Pack>
+      <PackagePath></PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
