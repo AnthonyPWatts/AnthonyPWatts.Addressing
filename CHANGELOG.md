@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.2.0
 
 Moves all country-specific behaviour into country packages and adds Ireland and France.
 
@@ -8,6 +8,15 @@ Moves all country-specific behaviour into country packages and adds Ireland and 
 
 - Core package now supports zero countries and provides shared registries, abstractions, and generic fallbacks only.
 - Great Britain, United States, and Canada moved from core into country packages.
+- Extended consumer-style test rigs for checkout APIs, dynamic profile-driven forms, and bulk CSV imports.
+- Release validation updates for the expanded country package family.
+
+## 1.1.0
+
+Adds Ireland and France country packages.
+
+### Includes
+
 - Ireland validation, formatting, DI registration and profile metadata.
 - France validation, formatting, DI registration and profile metadata.
 - Convenience `CountryCode` constants for all supported ISO 3166-1 alpha-2 codes.
