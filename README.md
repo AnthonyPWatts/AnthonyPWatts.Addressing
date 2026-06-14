@@ -113,6 +113,8 @@ Address profiles expose country-specific metadata that applications can use to b
 
 Profiles are metadata only. They do not render UI, validate an address, format an address, autocomplete addresses, geocode, or prove deliverability. They are framework-agnostic, so the same data can be used from ASP.NET, Blazor, React, console tools, APIs, imports, or custom validation pipelines.
 
+For countries with well-defined administrative subdivisions in the package, the administrative-area field can include selectable `Options`. The current built-in metadata includes options for US states and territories, Canadian provinces and territories, and Spanish provinces. GB counties intentionally remain a free-text optional field because county usage is not strict enough to model as a closed validation list.
+
 ```csharp
 using ISOCodex.Addressing.Profiles;
 

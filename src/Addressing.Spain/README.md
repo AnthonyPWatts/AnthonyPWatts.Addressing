@@ -9,6 +9,8 @@
 - Spanish address profile metadata
 - `AddSpainAddressing()` DI extension
 
+The Spanish address profile includes province options on the administrative-area field. These options are form metadata for consumers; validation remains handled by `SpanishAddressValidator`.
+
 ## Prerequisites
 
 Register the core addressing services first.

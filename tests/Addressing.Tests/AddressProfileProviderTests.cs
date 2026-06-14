@@ -73,6 +73,22 @@ public class AddressProfileProviderTests
     }
 
     [Fact]
+    public void AddAddressing_WithUs_ProvidesStateOptions()
+    {
+        var provider = BuildProfileProvider(CountryCode.US);
+
+        var administrativeArea = GetAdministrativeArea(provider.GetProfile(CountryCode.US));
+
+        Assert.Equal(AddressFieldInputKind.Select, administrativeArea.InputKind);
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "DC" && option.Label == "District of Columbia");
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "CA" && option.Label == "California");
+    }
+
+    [Fact]
     public void AddAddressing_WithCa_UsesCanadaFieldLabels()
     {
         var provider = BuildProfileProvider(CountryCode.CA);
@@ -84,6 +100,36 @@ public class AddressProfileProviderTests
         Assert.Equal(
             "Postal code",
             profile.Fields.Single(field => field.Field == AddressField.PostalCode).Label);
+    }
+
+    [Fact]
+    public void AddAddressing_WithCa_ProvidesProvinceAndTerritoryOptions()
+    {
+        var provider = BuildProfileProvider(CountryCode.CA);
+
+        var administrativeArea = GetAdministrativeArea(provider.GetProfile(CountryCode.CA));
+
+        Assert.Equal(AddressFieldInputKind.Select, administrativeArea.InputKind);
+        Assert.Equal(13, administrativeArea.Options.Count);
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "ON" && option.Label == "Ontario");
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "NU" && option.Label == "Nunavut");
+    }
+
+    [Fact]
+    public void AddAddressing_WithGb_DoesNotProvideCountyOptions()
+    {
+        var provider = BuildProfileProvider(CountryCode.GB);
+
+        var administrativeArea = GetAdministrativeArea(provider.GetProfile(CountryCode.GB));
+
+        Assert.Equal("County", administrativeArea.Label);
+        Assert.False(administrativeArea.IsRequired);
+        Assert.Equal(AddressFieldInputKind.Text, administrativeArea.InputKind);
+        Assert.Empty(administrativeArea.Options);
     }
 
     [Fact]
@@ -182,6 +228,49 @@ public class AddressProfileProviderTests
             profile.Fields.Single(field => field.Field == AddressField.PostalCode).Label);
     }
 
+    [Fact]
+    public void AddSpainAddressing_ProvidesProvinceOptions()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAddressing();
+        services.AddSpainAddressing();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var provider = serviceProvider.GetRequiredService<IAddressProfileProvider>();
+
+        var administrativeArea = GetAdministrativeArea(provider.GetProfile(CountryCode.ES));
+
+        Assert.Equal(AddressFieldInputKind.Select, administrativeArea.InputKind);
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "Madrid" && option.Label == "Madrid");
+        Assert.Contains(
+            administrativeArea.Options,
+            option => option.Value == "Barcelona" && option.Label == "Barcelona");
+    }
+
+    [Fact]
+    public void AddressFieldProfile_CopiesOptionCollection()
+    {
+        var options = new[]
+        {
+            new AddressFieldOption("ON", "Ontario")
+        };
+
+        var field = new AddressFieldProfile(
+            AddressField.AdministrativeArea,
+            "Province or territory",
+            true,
+            10,
+            options: options);
+
+        options[0] = new AddressFieldOption("QC", "Quebec");
+
+        Assert.Equal("ON", field.Options.Single().Value);
+        Assert.False(field.Options is AddressFieldOption[]);
+    }
+
     private static IAddressProfileProvider BuildProfileProvider(params CountryCode[] countries)
     {
         var services = new ServiceCollection();
@@ -197,5 +286,10 @@ public class AddressProfileProviderTests
         Assert.Contains(
             profile.Fields,
             fieldProfile => fieldProfile.Field == field && fieldProfile.IsRequired);
+    }
+
+    private static AddressFieldProfile GetAdministrativeArea(AddressProfile profile)
+    {
+        return profile.Fields.Single(field => field.Field == AddressField.AdministrativeArea);
     }
 }

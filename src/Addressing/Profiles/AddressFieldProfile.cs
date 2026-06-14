@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
 namespace ISOCodex.Addressing.Profiles
 {
     public sealed class AddressFieldProfile
@@ -10,6 +14,7 @@ namespace ISOCodex.Addressing.Profiles
             string? placeholder = null,
             string? helpText = null,
             AddressFieldInputKind inputKind = AddressFieldInputKind.Text,
+            IEnumerable<AddressFieldOption>? options = null,
             bool isUsed = true)
         {
             Field = field;
@@ -20,6 +25,8 @@ namespace ISOCodex.Addressing.Profiles
             Placeholder = placeholder;
             HelpText = helpText;
             InputKind = inputKind;
+            Options = new ReadOnlyCollection<AddressFieldOption>(
+                (options ?? Enumerable.Empty<AddressFieldOption>()).ToArray());
         }
 
         public AddressField Field { get; }
@@ -37,5 +44,7 @@ namespace ISOCodex.Addressing.Profiles
         public string? HelpText { get; }
 
         public AddressFieldInputKind InputKind { get; }
+
+        public IReadOnlyList<AddressFieldOption> Options { get; }
     }
 }

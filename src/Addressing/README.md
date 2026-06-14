@@ -256,6 +256,8 @@ Address profiles provide framework-agnostic metadata for building address entry 
 
 Profiles complement the `Address` model, formatters, and validators. They do not render UI, validate addresses, autocomplete, geocode, call remote services, or prove deliverability.
 
+Fields may include selectable `Options` when the package already has stable subdivision metadata. US profiles expose state and territory options, Canadian profiles expose province and territory options, and Spain profiles expose province options from the Spain package. GB counties are deliberately left as optional text metadata rather than a closed option list.
+
 ```csharp
 using ISOCodex.Addressing.Profiles;
 
