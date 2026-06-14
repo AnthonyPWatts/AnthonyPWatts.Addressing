@@ -41,7 +41,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - name: Release check
         shell: pwsh
@@ -56,12 +56,9 @@ jobs:
       - name: Publish core package
         shell: pwsh
         run: |
+          $version = "${{ steps.ref.outputs.value }}".TrimStart("v")
           $package = Get-ChildItem artifacts/release-check/ISOCodex.Addressing.*.nupkg |
-            Where-Object {
-              $_.Name -notlike "ISOCodex.Addressing.France.*" -and
-              $_.Name -notlike "ISOCodex.Addressing.Ireland.*" -and
-              $_.Name -notlike "ISOCodex.Addressing.Spain.*"
-            } |
+            Where-Object { $_.BaseName -eq "ISOCodex.Addressing.$version" } |
             Select-Object -First 1
 
           if ($null -eq $package) {
@@ -70,38 +67,25 @@ jobs:
 
           dotnet nuget push $package.FullName --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
 
-      - name: Publish France package
+      - name: Publish country packages
         shell: pwsh
         run: |
-          $package = Get-ChildItem artifacts/release-check/ISOCodex.Addressing.France.*.nupkg |
-            Select-Object -First 1
+          $packageIds = @(
+            "ISOCodex.Addressing.GreatBritain",
+            "ISOCodex.Addressing.UnitedStates",
+            "ISOCodex.Addressing.Canada",
+            "ISOCodex.Addressing.Spain",
+            "ISOCodex.Addressing.Ireland",
+            "ISOCodex.Addressing.France"
+          )
 
-          if ($null -eq $package) {
-            throw "France package was not found."
+          foreach ($packageId in $packageIds) {
+            $package = Get-ChildItem "artifacts/release-check/$packageId.*.nupkg" |
+              Select-Object -First 1
+
+            if ($null -eq $package) {
+              throw "$packageId package was not found."
+            }
+
+            dotnet nuget push $package.FullName --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
           }
-
-          dotnet nuget push $package.FullName --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
-
-      - name: Publish Ireland package
-        shell: pwsh
-        run: |
-          $package = Get-ChildItem artifacts/release-check/ISOCodex.Addressing.Ireland.*.nupkg |
-            Select-Object -First 1
-
-          if ($null -eq $package) {
-            throw "Ireland package was not found."
-          }
-
-          dotnet nuget push $package.FullName --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
-
-      - name: Publish Spain package
-        shell: pwsh
-        run: |
-          $package = Get-ChildItem artifacts/release-check/ISOCodex.Addressing.Spain.*.nupkg |
-            Select-Object -First 1
-
-          if ($null -eq $package) {
-            throw "Spain package was not found."
-          }
-
-          dotnet nuget push $package.FullName --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json

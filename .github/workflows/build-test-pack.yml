@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
         run: dotnet restore ISOCodex.Addressing.sln
@@ -30,6 +30,15 @@ jobs:
 
       - name: Pack core package
         run: dotnet pack src/Addressing/Addressing.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Pack Great Britain package
+        run: dotnet pack src/Addressing.GreatBritain/Addressing.GreatBritain.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Pack United States package
+        run: dotnet pack src/Addressing.UnitedStates/Addressing.UnitedStates.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Pack Canada package
+        run: dotnet pack src/Addressing.Canada/Addressing.Canada.csproj --configuration Release --no-build -o ./artifacts
 
       - name: Pack France package
         run: dotnet pack src/Addressing.France/Addressing.France.csproj --configuration Release --no-build -o ./artifacts
