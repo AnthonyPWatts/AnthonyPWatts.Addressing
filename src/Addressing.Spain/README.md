@@ -17,6 +17,10 @@ Profile consumers can inspect those options through `IAddressProfileProvider` an
 
 Register the core addressing services first.
 
+```bash
+dotnet add package ISOCodex.Addressing.Spain
+```
+
 ## Example
 
 ```csharp
@@ -63,6 +67,8 @@ var result = validatorFactory
 ```
 
 For invalid Spanish addresses, issues include codes such as `Address.PostalCode.Invalid`, `Address.StateOrProvince.Invalid`, and `Address.PostalCode.ProvinceMismatch`.
+
+`AddressValidationIssue.Code` is intended for programmatic handling and follows the core package compatibility policy. Human-readable messages may be refined for clarity in future minor or patch releases.
 
 Default formatted output:
 

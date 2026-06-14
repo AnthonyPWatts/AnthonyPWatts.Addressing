@@ -19,6 +19,7 @@
 
 ```bash
 dotnet add package ISOCodex.Addressing
+dotnet add package ISOCodex.Addressing.Spain
 ```
 
 ## Quick start
@@ -193,6 +194,8 @@ if (!result.IsValid)
 
 Each issue includes a stable `Code`, a human-readable `Message`, and an optional `PropertyName`.
 
+`AddressValidationIssue.Code` is intended for programmatic handling and should be treated as the stable machine-readable contract. `Message` is intended for display/logging and may be refined for clarity in future minor or patch releases.
+
 ### Using validation results with FluentValidation
 
 `ISOCodex.Addressing` does not depend on FluentValidation. The core package returns structured validation results so applications can adapt address validation into FluentValidation, ASP.NET ModelState, Blazor forms, imports, or their own validation pipeline.
@@ -295,6 +298,8 @@ FR
 
 Fallbacks do not make the `Address` model fully freeform. `Address` still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If an application needs to store addresses that cannot fit that structure, it should keep a separate raw/freeform field in its own persistence model.
 
+The core `Address` model is intentionally a structured postal-address abstraction rather than a fully freeform global address record. It works best where an address can reasonably be represented using line, locality, postal-code and country components. Applications that must preserve arbitrary user-entered or legacy addresses should store the raw original text separately.
+
 ## Recommended persistence shape
 
 For relational storage, persist the value objects as strings and keep constraints aligned with the `Address` model rather than with one country's postal rules.
@@ -361,9 +366,26 @@ Example validation issue payload:
 ]
 ```
 
-`ValidationProfile` should be specific enough for the application to understand what the result means later. If validation freshness matters, include a package or rules version in that value, for example `ISOCodex.Addressing.GB@1.0.0-alpha.4`.
+`ValidationProfile` should be specific enough for the application to understand what the result means later. If validation freshness matters, include a package or rules version in that value, for example `ISOCodex.Addressing.GB@1.0.0`.
 
 This metadata is application state, so it is not part of the `Address` value object. Store it with the owning entity or address record when your workflow needs to distinguish saved, validated, failed, and accepted-unverified addresses.
+
+## JSON serialization guidance
+
+`Address` is a domain model that contains value objects. If you serialize it directly with `System.Text.Json`, `PostalCode` and `CountryCode` are represented by their object properties:
+
+```json
+{
+  "line1": "10 Downing Street",
+  "line2": null,
+  "city": "London",
+  "stateOrProvince": null,
+  "postalCode": { "code": "SW1A 2AA" },
+  "countryCode": { "code": "GB" }
+}
+```
+
+For public APIs or storage contracts that should expose scalar strings, map to an application DTO with `postalCode` and `countryCode` string properties.
 
 ## Built-in countries
 
@@ -402,6 +424,14 @@ var profileProvider = serviceProvider.GetRequiredService<IAddressProfileProvider
 ## Release focus
 
 Package identity, namespaces, NuGet metadata, and package documentation should stay aligned under the `ISOCodex.Addressing` name.
+
+## Compatibility policy
+
+From `1.0.0`, public types, method signatures, value-object behaviour, and validation issue codes are treated as compatibility-sensitive.
+
+Patch and minor releases may add new countries, metadata, helper APIs, validation cases, and documentation. They may also correct country-specific formatting or validation behaviour where the existing behaviour is demonstrably wrong.
+
+Validation issue `Code` values are intended for programmatic handling and should remain stable unless a major version change is made. Human-readable validation messages may be refined for clarity in minor or patch releases.
 
 ## License
 

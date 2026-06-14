@@ -101,6 +101,8 @@ Each `AddressValidationIssue` contains:
 - `Message` - human-readable description
 - `PropertyName` - related `Address` property when applicable
 
+`AddressValidationIssue.Code` is intended for programmatic handling and should be treated as the stable machine-readable contract. `Message` is intended for display/logging and may be refined for clarity in future minor or patch releases.
+
 Built-in validators collect multiple issues where possible.
 
 ## Use validation results with FluentValidation
@@ -377,6 +379,8 @@ This is intended for store-first, import, migration, and validate-later workflow
 
 Generic fallbacks do not make `Address` freeform. The core model still requires `Line1`, `City`, `PostalCode`, and `CountryCode`. If your application must preserve addresses that do not fit that structure, store the raw address text separately in your own data model.
 
+The core `Address` model is intentionally a structured postal-address abstraction rather than a fully freeform global address record. It works best where an address can reasonably be represented using line, locality, postal-code and country components. Applications that must preserve arbitrary user-entered or legacy addresses should store the raw original text separately.
+
 ## Recommended persistence shape
 
 The package does not prescribe a database schema, but consumers usually get the best results by storing the structured `Address` fields directly and keeping database constraints country-neutral.
@@ -450,9 +454,26 @@ Example issue payload:
 ]
 ```
 
-`ValidationProfile` should identify the rule set that produced the result. For workflows that care about stale validation, include a package or rules version, for example `ISOCodex.Addressing.GB@1.0.0-alpha.4`.
+`ValidationProfile` should identify the rule set that produced the result. For workflows that care about stale validation, include a package or rules version, for example `ISOCodex.Addressing.GB@1.0.0`.
 
 Keep this metadata outside the `Address` value object. It belongs to the consuming application's persistence or workflow state.
+
+## JSON serialization guidance
+
+`Address` is a domain model that contains value objects. If you serialize it directly with `System.Text.Json`, `PostalCode` and `CountryCode` are represented by their object properties:
+
+```json
+{
+  "line1": "10 Downing Street",
+  "line2": null,
+  "city": "London",
+  "stateOrProvince": null,
+  "postalCode": { "code": "SW1A 2AA" },
+  "countryCode": { "code": "GB" }
+}
+```
+
+For public APIs or storage contracts that should expose scalar strings, map to an application DTO with `postalCode` and `countryCode` string properties.
 
 ## Country-specific notes
 
@@ -490,6 +511,14 @@ Country support can be extended through additional packages. Spain support is pr
 - `AddGenericAddressingFallbacks()` is opt-in and keeps registered country-specific services ahead of generic behaviour
 - Persistence should store `PostalCode.Code` and `CountryCode.Code` as strings
 - Validation status is application state and should be stored separately from the `Address` value
+
+## Compatibility policy
+
+From `1.0.0`, public types, method signatures, value-object behaviour, and validation issue codes are treated as compatibility-sensitive.
+
+Patch and minor releases may add new countries, metadata, helper APIs, validation cases, and documentation. They may also correct country-specific formatting or validation behaviour where the existing behaviour is demonstrably wrong.
+
+Validation issue `Code` values are intended for programmatic handling and should remain stable unless a major version change is made. Human-readable validation messages may be refined for clarity in minor or patch releases.
 
 ## License
 

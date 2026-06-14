@@ -109,6 +109,41 @@ foreach ($package in $packages)
         {
             throw "$($package.Name) does not contain a netstandard2.1 library"
         }
+
+        if ($package.Name -eq "ISOCodex.Addressing.Spain.$version.nupkg")
+        {
+            $nuspecEntry = $archive.GetEntry($nuspec)
+
+            if ($null -eq $nuspecEntry)
+            {
+                throw "$($package.Name) nuspec could not be read"
+            }
+
+            $reader = New-Object System.IO.StreamReader($nuspecEntry.Open())
+
+            try
+            {
+                [xml] $nuspecXml = $reader.ReadToEnd()
+            }
+            finally
+            {
+                $reader.Dispose()
+            }
+
+            $coreDependency = $nuspecXml.package.metadata.dependencies.group.dependency |
+                Where-Object { $_.id -eq "ISOCodex.Addressing" } |
+                Select-Object -First 1
+
+            if ($null -eq $coreDependency)
+            {
+                throw "$($package.Name) does not depend on ISOCodex.Addressing"
+            }
+
+            if ($coreDependency.version -ne $version)
+            {
+                throw "$($package.Name) depends on ISOCodex.Addressing $($coreDependency.version), expected $version"
+            }
+        }
     }
     finally
     {

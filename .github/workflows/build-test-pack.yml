@@ -30,3 +30,12 @@ jobs:
 
       - name: Pack core package
         run: dotnet pack src/Addressing/Addressing.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Pack Spain package
+        run: dotnet pack src/Addressing.Spain/Addressing.Spain.csproj --configuration Release --no-build -o ./artifacts
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: ./artifacts/*.nupkg
