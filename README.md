@@ -2,6 +2,10 @@
 
 `ISOCodex.Addressing` is a .NET library for modelling, formatting, and validating postal addresses against country-specific rules.
 
+## Project status
+
+The core package and current country packages are stable and proven enough for production use. Future country packages will be demand-led: new countries should be added when there is a real consuming use case, sample data, or user need to justify maintaining the rules.
+
 ## Projects
 
 - `src/Addressing` - core types, DI registration, registries, generic fallback behaviours, and abstractions
