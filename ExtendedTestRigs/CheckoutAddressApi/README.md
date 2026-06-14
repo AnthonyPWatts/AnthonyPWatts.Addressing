@@ -14,6 +14,10 @@ dotnet run --project ExtendedTestRigs/CheckoutAddressApi --urls http://localhost
 
 Then use `CheckoutAddressApi.http` or call the endpoints directly.
 
+## Screenshot
+
+![Checkout address API address profile response](Screenshots/address-profile-es.png)
+
 ## Features exercised
 
 - Multi-country dependency injection registration.

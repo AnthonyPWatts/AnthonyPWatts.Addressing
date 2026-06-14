@@ -14,6 +14,10 @@ dotnet run --project ExtendedTestRigs/DynamicAddressFormDemo --urls http://local
 
 Open `http://localhost:5001`.
 
+## Screenshot
+
+![Dynamic address form demo showing the Spanish profile form](Screenshots/spanish-profile-form.png)
+
 ## Features exercised
 
 - Profile-driven field order, labels, required flags, placeholders, and input kind.

@@ -18,6 +18,10 @@ Outputs are written under the built app's `Output` directory:
 - `import-results.csv`
 - `import-summary.txt`
 
+## Screenshot
+
+![Bulk address import tool sample summary](Screenshots/sample-import-summary.png)
+
 ## Features exercised
 
 - CSV parsing with import-level error handling.
